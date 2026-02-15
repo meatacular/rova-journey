@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
+import { useJourney } from '@/lib/stores/journey';
 
 interface AdBreakProps {
   script: string;
@@ -12,22 +13,22 @@ interface AdBreakProps {
 }
 
 export function AdBreak({ script, duration, onComplete, isPaused, metadata }: AdBreakProps) {
-  const [elapsed, setElapsed] = useState(0);
+  const { elapsedTime, setElapsedTime } = useJourney();
 
   useEffect(() => {
     if (isPaused) return;
-    if (elapsed >= duration) {
+    if (elapsedTime >= duration) {
       onComplete();
       return;
     }
     const timer = setInterval(() => {
-      setElapsed((prev) => prev + 1);
+      setElapsedTime(elapsedTime + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [elapsed, duration, onComplete, isPaused]);
+  }, [elapsedTime, duration, onComplete, isPaused, setElapsedTime]);
 
-  const remaining = duration - elapsed;
-  const progress = (elapsed / duration) * 100;
+  const remaining = duration - elapsedTime;
+  const progress = (elapsedTime / duration) * 100;
   const advertiser = metadata?.advertiser as string | undefined;
   const adColor = (metadata?.color as string) || '#666';
   const tagline = (metadata?.tagline as string) || script;

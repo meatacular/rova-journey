@@ -19,7 +19,6 @@ export function JourneyPlayer() {
     segments,
     currentSegmentIndex,
     elapsedTime,
-    startJourney,
     pauseJourney,
     resumeJourney,
     skipSegment,
@@ -67,9 +66,7 @@ export function JourneyPlayer() {
     ? (elapsedTime / currentSegment.duration) * 100
     : 0;
 
-  const handlePlayPause = isPlaying
-    ? pauseJourney
-    : (segments[currentSegmentIndex]?.status === 'playing' ? resumeJourney : startJourney);
+  const handlePlayPause = isPlaying ? pauseJourney : resumeJourney;
 
   return (
     <div className="space-y-4 pb-20">
