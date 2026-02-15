@@ -53,7 +53,7 @@ function FeedCard({ icon: Icon, title, onSettings, onPlay, children, color }: {
 
 export function PreferenceCenter() {
   const [settingsSection, setSettingsSection] = useState<SettingsSection | null>(null);
-  const { startDefault } = useStartJourney();
+  const { startAtSegment } = useStartJourney();
 
   const {
     journeys, city, traffic,
@@ -78,7 +78,7 @@ export function PreferenceCenter() {
     <div className="space-y-3">
 
       {/* ── Traffic ── */}
-      <FeedCard icon={Car} title="Traffic" color="text-orange-400" onSettings={() => open('traffic')} onPlay={startDefault}>
+      <FeedCard icon={Car} title="Traffic" color="text-orange-400" onSettings={() => open('traffic')} onPlay={() => startAtSegment('traffic')}>
         {traffic.enabled && trafficRoutes[city] ? (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
@@ -103,7 +103,7 @@ export function PreferenceCenter() {
       </FeedCard>
 
       {/* ── Weather ── */}
-      <FeedCard icon={Cloud} title="Weather" color="text-sky-400" onSettings={() => open('weather')} onPlay={startDefault}>
+      <FeedCard icon={Cloud} title="Weather" color="text-sky-400" onSettings={() => open('weather')} onPlay={() => startAtSegment('weather')}>
         {weather.enabled && data ? (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ export function PreferenceCenter() {
       </FeedCard>
 
       {/* ── News ── */}
-      <FeedCard icon={Newspaper} title="News" color="text-red-400" onSettings={() => open('news')} onPlay={startDefault}>
+      <FeedCard icon={Newspaper} title="News" color="text-red-400" onSettings={() => open('news')} onPlay={() => startAtSegment('news')}>
         {news.enabled ? (
           <div className="space-y-2">
             <p className="text-sm font-medium">Black Caps lineup announced for England tour</p>
@@ -159,7 +159,7 @@ export function PreferenceCenter() {
       </FeedCard>
 
       {/* ── Sport ── */}
-      <FeedCard icon={Trophy} title="Sport" color="text-green-400" onSettings={() => open('sport')} onPlay={startDefault}>
+      <FeedCard icon={Trophy} title="Sport" color="text-green-400" onSettings={() => open('sport')} onPlay={() => startAtSegment('sport')}>
         {sport.enabled ? (
           <div className="space-y-2">
             <p className="text-sm font-medium">Silver Ferns claim Constellation Cup</p>
@@ -184,7 +184,7 @@ export function PreferenceCenter() {
         title={entertainment.type === 'station' ? 'Station' : 'Podcast'}
         color="text-purple-400"
         onSettings={() => open('listen')}
-        onPlay={startDefault}
+        onPlay={() => startAtSegment('entertainment')}
       >
         {entertainment.type === 'station' && station ? (
           <div className="flex items-center gap-3">

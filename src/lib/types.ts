@@ -107,12 +107,19 @@ export interface MusicBed {
 
 export type SegmentType = 'traffic' | 'weather' | 'news' | 'sport' | 'entertainment' | 'ad';
 
+export interface Chapter {
+  title: string;
+  duration: number;
+  script: string;
+}
+
 export interface JourneySegment {
   id: string;
   type: SegmentType;
   title: string;
   duration: number;
   script?: string;
+  chapters?: Chapter[];
   status: 'upcoming' | 'playing' | 'done';
   metadata?: Record<string, unknown>;
 }

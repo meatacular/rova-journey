@@ -13,7 +13,20 @@ import { SegmentTabBar } from './SegmentTabBar';
 import { PersonalisePrompt } from './PersonalisePrompt';
 import { CalendarCard } from './CalendarCard';
 import { useRouter } from 'next/navigation';
-import { SegmentType } from '@/lib/types';
+import { SegmentType, Chapter } from '@/lib/types';
+
+/** Find which chapter the elapsed time falls into */
+function getCurrentChapter(chapters: Chapter[], elapsedTime: number) {
+  let accumulated = 0;
+  for (let i = 0; i < chapters.length; i++) {
+    if (elapsedTime < accumulated + chapters[i].duration) {
+      return { index: i, chapterStart: accumulated };
+    }
+    accumulated += chapters[i].duration;
+  }
+  const lastStart = chapters.reduce((sum, ch, i) => i < chapters.length - 1 ? sum + ch.duration : sum, 0);
+  return { index: chapters.length - 1, chapterStart: lastStart };
+}
 
 export function JourneyPlayer() {
   const router = useRouter();
@@ -69,6 +82,31 @@ export function JourneyPlayer() {
     router.push('/');
   };
 
+  // Chapter-aware skip: advance to next chapter, or next segment if last chapter
+  const handleSkip = useCallback(() => {
+    if (!currentSegment) return;
+    const chapters = currentSegment.chapters;
+    if (chapters && chapters.length > 1) {
+      const { index } = getCurrentChapter(chapters, elapsedTime);
+      if (index < chapters.length - 1) {
+        // Jump to start of next chapter
+        let nextStart = 0;
+        for (let i = 0; i <= index; i++) {
+          nextStart += chapters[i].duration;
+        }
+        setElapsedTime(nextStart);
+        return;
+      }
+    }
+    // Last chapter or no chapters — skip to next segment
+    skipSegment();
+  }, [currentSegment, elapsedTime, setElapsedTime, skipSegment]);
+
+  // Scrubber callback
+  const handleScrub = useCallback((time: number) => {
+    setElapsedTime(time);
+  }, [setElapsedTime]);
+
   if (!isActive || !currentSegment) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
@@ -115,7 +153,12 @@ export function JourneyPlayer() {
         />
       ) : (
         <>
-          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} progress={progress} />
+          <SegmentDisplay
+            segment={currentSegment}
+            elapsedTime={elapsedTime}
+            progress={progress}
+            onScrub={handleScrub}
+          />
           {currentSegment.type === 'entertainment' && currentSegment.metadata?.entertainmentType === 'station' && currentSegment.metadata?.streamUrl && (
             <RadioPlayer
               streamUrl={currentSegment.metadata.streamUrl as string}
@@ -129,6 +172,9 @@ export function JourneyPlayer() {
               host={currentSegment.metadata.podcastHost as string}
               episodeTitle={currentSegment.metadata.episodeTitle as string}
               artwork={currentSegment.metadata.podcastArtwork as string}
+              chapters={currentSegment.chapters}
+              elapsedTime={elapsedTime}
+              onChapterJump={handleScrub}
             />
           )}
           {currentSegment.type === 'entertainment' && <CalendarCard />}
@@ -151,7 +197,7 @@ export function JourneyPlayer() {
         </button>
         {/* Skip overlaps on top, pulled left 10% over the play button */}
         <button
-          onClick={skipSegment}
+          onClick={handleSkip}
           className="-ml-[10%] z-10 flex h-16 w-16 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
         >
           <SkipForward className="h-7 w-7 sm:h-5 sm:w-5" />

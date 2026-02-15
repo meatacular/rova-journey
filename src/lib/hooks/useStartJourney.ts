@@ -11,7 +11,7 @@ import { JourneySegment, JourneyPreset, SegmentType } from '@/lib/types';
 export function useStartJourney() {
   const router = useRouter();
   const prefs = usePreferences();
-  const { buildJourney, startJourney, showSplash, setShowSplash } = useJourney();
+  const { buildJourney, startJourney, jumpToSegment, showSplash, setShowSplash } = useJourney();
 
   const station = stations.find((s) => s.id === prefs.entertainment.stationId);
   const podcast = podcasts.find((p) => p.id === prefs.entertainment.podcastId);
@@ -74,13 +74,16 @@ export function useStartJourney() {
     }
 
     if (useNews) {
-      const newsLength = prefs.news.length as keyof typeof scripts.news;
+      const newsLength = prefs.news.length as keyof typeof scripts.newsChapters;
+      const newsChapters = scripts.newsChapters[newsLength] || scripts.newsChapters.standard;
+      const newsDuration = newsChapters.reduce((sum, ch) => sum + ch.duration, 0);
       segments.push({
         id: String(id++),
         type: 'news',
-        title: 'Your News — Black Caps lineup announced',
-        duration: prefs.news.length === 'brief' ? 30 : prefs.news.length === 'detailed' ? 90 : 60,
-        script: scripts.news[newsLength] || scripts.news.standard,
+        title: newsChapters[0].title,
+        duration: newsDuration,
+        script: newsChapters.map((ch) => ch.script).join(' '),
+        chapters: newsChapters,
         status: 'upcoming',
       });
       segments.push({
@@ -95,12 +98,15 @@ export function useStartJourney() {
     }
 
     if (useSport) {
+      const sportChapters = scripts.sportChapters;
+      const sportDuration = sportChapters.reduce((sum, ch) => sum + ch.duration, 0);
       segments.push({
         id: String(id++),
         type: 'sport' as SegmentType,
-        title: 'Sport — Silver Ferns claim Constellation Cup',
-        duration: prefs.sport?.length === 'brief' ? 30 : prefs.sport?.length === 'detailed' ? 90 : 60,
-        script: "Sport now — Cricket New Zealand has named the Black Caps squad for the upcoming test series in England. Kane Williamson returns to captain the side. And the Silver Ferns have claimed the Constellation Cup with a dramatic 58-56 win over Australia in Melbourne.",
+        title: sportChapters[0].title,
+        duration: sportDuration,
+        script: sportChapters.map((ch) => ch.script).join(' '),
+        chapters: sportChapters,
         status: 'upcoming',
       });
       segments.push({
@@ -116,16 +122,20 @@ export function useStartJourney() {
 
     if (useEntertainment) {
       const isStation = prefs.entertainment.type === 'station';
+      const podcastId = prefs.entertainment.podcastId as keyof typeof scripts.podcastChapters;
+      const podChapters = !isStation ? scripts.podcastChapters[podcastId] : undefined;
+      const podDuration = podChapters ? podChapters.reduce((sum, ch) => sum + ch.duration, 0) : 300;
       segments.push({
         id: String(id++),
         type: 'entertainment',
         title: isStation
           ? (station?.name || 'The Edge')
-          : (podcast?.latestEpisode?.title || podcast?.name || 'Podcast'),
-        duration: 300,
+          : podChapters ? podChapters[0].title : (podcast?.latestEpisode?.title || podcast?.name || 'Podcast'),
+        duration: podDuration,
         script: isStation
           ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
-          : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
+          : podChapters ? podChapters.map((ch) => ch.script).join(' ') : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
+        chapters: podChapters,
         status: 'upcoming',
         metadata: isStation
           ? { streamUrl: station?.streamUrl, stationColor: station?.color, entertainmentType: 'station' }
@@ -214,12 +224,15 @@ export function useStartJourney() {
     });
 
     // News
+    const genericNewsChapters = scripts.newsChapters.standard;
+    const genericNewsDuration = genericNewsChapters.reduce((sum, ch) => sum + ch.duration, 0);
     segments.push({
       id: String(id++),
       type: 'news',
-      title: 'Your News — Black Caps lineup announced',
-      duration: 60,
-      script: scripts.news.standard,
+      title: genericNewsChapters[0].title,
+      duration: genericNewsDuration,
+      script: genericNewsChapters.map((ch) => ch.script).join(' '),
+      chapters: genericNewsChapters,
       status: 'upcoming',
     });
     segments.push({
@@ -233,12 +246,15 @@ export function useStartJourney() {
     });
 
     // Sport
+    const genericSportChapters = scripts.sportChapters;
+    const genericSportDuration = genericSportChapters.reduce((sum, ch) => sum + ch.duration, 0);
     segments.push({
       id: String(id++),
       type: 'sport' as SegmentType,
-      title: 'Sport — Silver Ferns claim Constellation Cup',
-      duration: 60,
-      script: "Sport now — Cricket New Zealand has named the Black Caps squad for the upcoming test series in England. Kane Williamson returns to captain the side. And the Silver Ferns have claimed the Constellation Cup with a dramatic 58-56 win over Australia in Melbourne.",
+      title: genericSportChapters[0].title,
+      duration: genericSportDuration,
+      script: genericSportChapters.map((ch) => ch.script).join(' '),
+      chapters: genericSportChapters,
       status: 'upcoming',
     });
     segments.push({
@@ -252,12 +268,15 @@ export function useStartJourney() {
     });
 
     // Entertainment — use a featured podcast for first-time generic journeys
+    const genericPodChapters = scripts.podcastChapters[randomPodcastId as keyof typeof scripts.podcastChapters];
+    const genericPodDuration = genericPodChapters ? genericPodChapters.reduce((sum, ch) => sum + ch.duration, 0) : 300;
     segments.push({
       id: String(id++),
       type: 'entertainment',
-      title: genericPodcast.latestEpisode.title,
-      duration: 300,
-      script: `Now playing ${genericPodcast.name} — ${genericPodcast.latestEpisode.title}`,
+      title: genericPodChapters ? genericPodChapters[0].title : genericPodcast.latestEpisode.title,
+      duration: genericPodDuration,
+      script: genericPodChapters ? genericPodChapters.map((ch) => ch.script).join(' ') : `Now playing ${genericPodcast.name} — ${genericPodcast.latestEpisode.title}`,
+      chapters: genericPodChapters,
       status: 'upcoming',
       metadata: {
         entertainmentType: 'podcast',
@@ -273,11 +292,24 @@ export function useStartJourney() {
     router.push('/journey');
   };
 
+  const startAtSegment = (segmentType: SegmentType) => {
+    const segments = buildSegments();
+    buildJourney(segments);
+    startJourney();
+    // Find the first segment matching the type and jump to it
+    const idx = segments.findIndex((s) => s.type === segmentType);
+    if (idx > 0) {
+      jumpToSegment(idx);
+    }
+    router.push('/journey');
+  };
+
   return {
     handleStartJourney,
     startFromPreset,
     startDefault,
     startGeneric,
+    startAtSegment,
     entertainmentName,
     showSplash,
     setShowSplash,
