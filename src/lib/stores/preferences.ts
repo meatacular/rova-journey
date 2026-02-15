@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserPreferences, NewsCategory, SportCategory } from '@/lib/types';
+import { UserPreferences, NewsCategory, SportCategory, JourneyPreset } from '@/lib/types';
 
 interface PreferencesStore extends UserPreferences {
   setHomeAddress: (address: string) => void;
@@ -24,6 +24,10 @@ interface PreferencesStore extends UserPreferences {
   setCalendarConnected: (connected: boolean) => void;
   setCalendarProvider: (provider: 'google' | 'apple' | 'microsoft' | null) => void;
   setVoiceSpeed: (speed: number) => void;
+  setJourneys: (journeys: JourneyPreset[]) => void;
+  updateJourney: (id: string, updates: Partial<JourneyPreset>) => void;
+  addJourney: (journey: JourneyPreset) => void;
+  removeJourney: (id: string) => void;
 }
 
 export const usePreferences = create<PreferencesStore>()(
@@ -59,6 +63,63 @@ export const usePreferences = create<PreferencesStore>()(
         mode: 'auto' as const,
         styleId: 'pop',
       },
+      journeys: [
+        {
+          id: 'drive-to-work',
+          name: 'Drive to Work',
+          icon: '🏢',
+          from: 'Grey Lynn',
+          to: 'Auckland CBD',
+          segments: { traffic: true, weather: true, news: true, sport: true, entertainment: true },
+          schedule: { enabled: true, days: [1, 2, 3, 4, 5], time: '07:30' },
+          calendarSync: true,
+          isDefault: true,
+        },
+        {
+          id: 'drive-home',
+          name: 'Drive Home',
+          icon: '🏠',
+          from: 'Auckland CBD',
+          to: 'Grey Lynn',
+          segments: { traffic: true, weather: true, news: true, sport: true, entertainment: true },
+          schedule: { enabled: true, days: [1, 2, 3, 4, 5], time: '17:00' },
+          calendarSync: false,
+          isDefault: false,
+        },
+        {
+          id: 'school-run',
+          name: 'School Run',
+          icon: '🎒',
+          from: 'Grey Lynn',
+          to: 'Ponsonby Primary',
+          segments: { traffic: true, weather: true, news: false, sport: false, entertainment: true },
+          schedule: { enabled: true, days: [1, 2, 3, 4, 5], time: '08:15' },
+          calendarSync: false,
+          isDefault: false,
+        },
+        {
+          id: 'gym',
+          name: 'Gym',
+          icon: '💪',
+          from: 'Grey Lynn',
+          to: 'Les Mills Auckland',
+          segments: { traffic: true, weather: false, news: false, sport: false, entertainment: true },
+          schedule: { enabled: true, days: [1, 3, 5], time: '06:00' },
+          calendarSync: false,
+          isDefault: false,
+        },
+        {
+          id: 'weekend-drive',
+          name: 'Weekend Drive',
+          icon: '🏖️',
+          from: 'Grey Lynn',
+          to: 'Piha Beach',
+          segments: { traffic: true, weather: true, news: true, sport: true, entertainment: true },
+          schedule: { enabled: true, days: [0, 6], time: '09:00' },
+          calendarSync: false,
+          isDefault: false,
+        },
+      ] as JourneyPreset[],
 
       setHomeAddress: (address) => set({ homeAddress: address }),
       setWorkAddress: (address) => set({ workAddress: address }),
@@ -97,6 +158,13 @@ export const usePreferences = create<PreferencesStore>()(
       setCalendarConnected: (connected) => set((s) => ({ calendar: { ...s.calendar, connected } })),
       setCalendarProvider: (provider) => set((s) => ({ calendar: { ...s.calendar, provider } })),
       setVoiceSpeed: (speed) => set({ voiceSpeed: speed }),
+      setJourneys: (journeys) => set({ journeys }),
+      updateJourney: (id, updates) =>
+        set((s) => ({
+          journeys: s.journeys.map((j) => (j.id === id ? { ...j, ...updates } : j)),
+        })),
+      addJourney: (journey) => set((s) => ({ journeys: [...s.journeys, journey] })),
+      removeJourney: (id) => set((s) => ({ journeys: s.journeys.filter((j) => j.id !== id) })),
     }),
     { name: 'rova-preferences' }
   )

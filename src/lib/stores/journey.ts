@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { JourneySegment, JourneyState } from '@/lib/types';
 
 interface JourneyStore extends JourneyState {
+  showSplash: boolean;
+  setShowSplash: (show: boolean) => void;
   buildJourney: (segments: JourneySegment[]) => void;
   startJourney: () => void;
   pauseJourney: () => void;
@@ -20,6 +22,9 @@ export const useJourney = create<JourneyStore>((set, get) => ({
   segments: [],
   currentSegmentIndex: 0,
   elapsedTime: 0,
+  showSplash: false,
+
+  setShowSplash: (show) => set({ showSplash: show }),
 
   buildJourney: (segments) =>
     set({

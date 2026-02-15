@@ -10,6 +10,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { usePreferences } from '@/lib/stores/preferences';
 import { trafficRoutes } from '@/data/mock/traffic';
 import { useStartJourney } from '@/lib/hooks/useStartJourney';
+import { JourneySplash } from '@/components/journey/JourneySplash';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -41,7 +42,7 @@ const headlines = [
 
 export default function HomePage() {
   const prefs = usePreferences();
-  const { handleStartJourney, entertainmentName } = useStartJourney();
+  const { handleStartJourney, startFromPreset, entertainmentName, showSplash, setShowSplash } = useStartJourney();
   const [showModal, setShowModal] = useState(false);
 
   const cityName =
@@ -286,6 +287,13 @@ export default function HomePage() {
             </button>
           </div>
         </div>
+      )}
+
+      {showSplash && (
+        <JourneySplash
+          onSelectJourney={startFromPreset}
+          onDismiss={() => setShowSplash(false)}
+        />
       )}
     </AppShell>
   );

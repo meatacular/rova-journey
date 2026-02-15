@@ -6,30 +6,38 @@ import { useJourney } from '@/lib/stores/journey';
 import { stations } from '@/data/mock/stations';
 import { podcasts } from '@/data/mock/podcasts';
 import { scripts } from '@/data/mock/scripts';
-import { JourneySegment, SegmentType } from '@/lib/types';
+import { JourneySegment, JourneyPreset, SegmentType } from '@/lib/types';
 
 export function useStartJourney() {
   const router = useRouter();
   const prefs = usePreferences();
-  const { buildJourney, startJourney } = useJourney();
+  const { buildJourney, startJourney, showSplash, setShowSplash } = useJourney();
 
   const station = stations.find((s) => s.id === prefs.entertainment.stationId);
   const podcast = podcasts.find((p) => p.id === prefs.entertainment.podcastId);
   const entertainmentName =
     prefs.entertainment.type === 'station' ? station?.name || 'The Edge' : podcast?.name || 'Podcast';
 
-  const handleStartJourney = () => {
+  const buildSegments = (preset?: JourneyPreset): JourneySegment[] => {
     const segments: JourneySegment[] = [];
     let id = 0;
     const adScripts = scripts.ad;
     let adIdx = 0;
     const cityKey = prefs.city as keyof typeof scripts.traffic;
 
-    if (prefs.traffic.enabled) {
+    const useTraffic = preset ? preset.segments.traffic : prefs.traffic.enabled;
+    const useWeather = preset ? preset.segments.weather : prefs.weather.enabled;
+    const useNews = preset ? preset.segments.news : prefs.news.enabled;
+    const useSport = preset ? preset.segments.sport : prefs.sport?.enabled;
+    const useEntertainment = preset ? preset.segments.entertainment : true;
+
+    const journeyLabel = preset ? preset.name.toLowerCase() : 'your journey to work';
+
+    if (useTraffic) {
       segments.push({
         id: String(id++),
         type: 'traffic',
-        title: 'Traffic for your journey to work',
+        title: `Traffic for ${journeyLabel}`,
         duration: 90,
         script: scripts.traffic[cityKey] || scripts.traffic.auckland,
         status: 'upcoming',
@@ -45,11 +53,11 @@ export function useStartJourney() {
       });
     }
 
-    if (prefs.weather.enabled) {
+    if (useWeather) {
       segments.push({
         id: String(id++),
         type: 'weather',
-        title: 'Weather for your journey to work',
+        title: `Weather for ${journeyLabel}`,
         duration: 60,
         script: scripts.weather[cityKey] || scripts.weather.auckland,
         status: 'upcoming',
@@ -65,7 +73,7 @@ export function useStartJourney() {
       });
     }
 
-    if (prefs.news.enabled) {
+    if (useNews) {
       const newsLength = prefs.news.length as keyof typeof scripts.news;
       segments.push({
         id: String(id++),
@@ -86,12 +94,12 @@ export function useStartJourney() {
       });
     }
 
-    if (prefs.sport?.enabled) {
+    if (useSport) {
       segments.push({
         id: String(id++),
         type: 'sport' as SegmentType,
         title: 'Sport — Silver Ferns claim Constellation Cup',
-        duration: prefs.sport.length === 'brief' ? 30 : prefs.sport.length === 'detailed' ? 90 : 60,
+        duration: prefs.sport?.length === 'brief' ? 30 : prefs.sport?.length === 'detailed' ? 90 : 60,
         script: "Sport now — Cricket New Zealand has named the Black Caps squad for the upcoming test series in England. Kane Williamson returns to captain the side. And the Silver Ferns have claimed the Constellation Cup with a dramatic 58-56 win over Australia in Melbourne.",
         status: 'upcoming',
       });
@@ -106,26 +114,52 @@ export function useStartJourney() {
       });
     }
 
-    segments.push({
-      id: String(id++),
-      type: 'entertainment',
-      title: entertainmentName,
-      duration: 300,
-      script:
-        prefs.entertainment.type === 'station'
-          ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
-          : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
-      status: 'upcoming',
-      metadata: {
-        streamUrl: station?.streamUrl,
-        stationColor: station?.color,
-      },
-    });
+    if (useEntertainment) {
+      segments.push({
+        id: String(id++),
+        type: 'entertainment',
+        title: entertainmentName,
+        duration: 300,
+        script:
+          prefs.entertainment.type === 'station'
+            ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
+            : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
+        status: 'upcoming',
+        metadata: {
+          streamUrl: station?.streamUrl,
+          stationColor: station?.color,
+        },
+      });
+    }
 
+    return segments;
+  };
+
+  const handleStartJourney = () => {
+    setShowSplash(true);
+  };
+
+  const startFromPreset = (preset: JourneyPreset) => {
+    const segments = buildSegments(preset);
+    buildJourney(segments);
+    startJourney();
+    setShowSplash(false);
+    router.push('/journey');
+  };
+
+  const startDefault = () => {
+    const segments = buildSegments();
     buildJourney(segments);
     startJourney();
     router.push('/journey');
   };
 
-  return { handleStartJourney, entertainmentName };
+  return {
+    handleStartJourney,
+    startFromPreset,
+    startDefault,
+    entertainmentName,
+    showSplash,
+    setShowSplash,
+  };
 }

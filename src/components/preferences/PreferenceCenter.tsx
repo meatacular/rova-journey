@@ -1,7 +1,8 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Cloud, Newspaper, Radio, Mic, Music, Trophy, Calendar } from 'lucide-react';
+import { Navigation, MapPin, Cloud, Newspaper, Radio, Mic, Music, Trophy, Calendar } from 'lucide-react';
+import { JourneyPrefs } from './JourneyPrefs';
 import { RoutePrefs } from './RoutePrefs';
 import { WeatherPrefs } from './WeatherPrefs';
 import { NewsPrefs } from './NewsPrefs';
@@ -13,8 +14,12 @@ import { CalendarPrefs } from './CalendarPrefs';
 
 export function PreferenceCenter() {
   return (
-    <Tabs defaultValue="route" className="w-full">
+    <Tabs defaultValue="journeys" className="w-full">
       <TabsList className="mb-4 flex w-full overflow-x-auto bg-secondary">
+        <TabsTrigger value="journeys" className="flex flex-col gap-0.5 px-2 py-2 text-xs data-[state=active]:text-primary">
+          <Navigation className="h-4 w-4" />
+          <span className="text-[10px]">Journeys</span>
+        </TabsTrigger>
         <TabsTrigger value="route" className="flex flex-col gap-0.5 px-2 py-2 text-xs data-[state=active]:text-primary">
           <MapPin className="h-4 w-4" />
           <span className="text-[10px]">Route</span>
@@ -49,6 +54,7 @@ export function PreferenceCenter() {
         </TabsTrigger>
       </TabsList>
 
+      <TabsContent value="journeys"><JourneyPrefs /></TabsContent>
       <TabsContent value="route"><RoutePrefs /></TabsContent>
       <TabsContent value="weather"><WeatherPrefs /></TabsContent>
       <TabsContent value="news"><NewsPrefs /></TabsContent>

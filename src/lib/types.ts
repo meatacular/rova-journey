@@ -118,6 +118,28 @@ export interface JourneySegment {
 
 export type NewsLength = 'brief' | 'standard' | 'detailed';
 
+export interface JourneyPreset {
+  id: string;
+  name: string;
+  icon: string;
+  from: string;
+  to: string;
+  segments: {
+    traffic: boolean;
+    weather: boolean;
+    news: boolean;
+    sport: boolean;
+    entertainment: boolean;
+  };
+  schedule: {
+    enabled: boolean;
+    days: number[];
+    time: string;
+  };
+  calendarSync: boolean;
+  isDefault: boolean;
+}
+
 export interface UserPreferences {
   homeAddress: string;
   workAddress: string;
@@ -153,6 +175,7 @@ export interface UserPreferences {
     mode: 'auto' | 'manual' | 'none';
     styleId: string;
   };
+  journeys: JourneyPreset[];
 }
 
 export interface JourneyState {
