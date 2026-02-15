@@ -31,15 +31,26 @@ export function AdBreak({ script, duration, onComplete, isPaused, metadata }: Ad
   const advertiser = metadata?.advertiser as string | undefined;
   const adColor = (metadata?.color as string) || '#666';
   const tagline = (metadata?.tagline as string) || script;
+  const adUrl = metadata?.url as string | undefined;
+
+  const brandBlock = (
+    <div
+      className="rounded-2xl p-6 flex items-center justify-center"
+      style={{ backgroundColor: adColor }}
+    >
+      <span className="text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
+    </div>
+  );
 
   return (
     <div className="flex flex-col items-center gap-4 py-8">
-      <div
-        className="rounded-2xl p-6 flex items-center justify-center"
-        style={{ backgroundColor: adColor }}
-      >
-        <span className="text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
-      </div>
+      {adUrl ? (
+        <a href={adUrl} target="_blank" rel="noopener noreferrer">
+          {brandBlock}
+        </a>
+      ) : (
+        brandBlock
+      )}
       <p className="text-center text-sm text-muted-foreground">{tagline}</p>
       <div className="w-full max-w-xs space-y-2">
         <Progress value={progress} className="h-1.5" />

@@ -101,21 +101,11 @@ export function JourneyPlayer() {
         </>
       )}
 
-      {/* Progress bar with skip — tight under captions */}
+      {/* Progress bar — tight under captions */}
       {currentSegment.type !== 'ad' && (
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Progress value={progress} className="h-1.5 flex-1" />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0 rounded-full"
-              onClick={skipSegment}
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground pr-10">
+          <Progress value={progress} className="h-1.5" />
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>
               {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
             </span>
@@ -128,13 +118,21 @@ export function JourneyPlayer() {
 
       <QueueList segments={segments} currentIndex={currentSegmentIndex} />
 
-      {/* Floating play/pause button — bottom right */}
-      <button
-        onClick={handlePlayPause}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
-      >
-        {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
-      </button>
+      {/* Floating play/pause + skip button — bottom right */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-1.5">
+        <button
+          onClick={handlePlayPause}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
+        >
+          {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
+        </button>
+        <button
+          onClick={skipSegment}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/80 text-primary-foreground shadow-md transition-transform active:scale-95"
+        >
+          <SkipForward className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }

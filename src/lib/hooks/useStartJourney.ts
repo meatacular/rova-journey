@@ -49,7 +49,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people' },
+        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
       });
     }
 
@@ -69,7 +69,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'Z Energy', color: '#FF6900', tagline: 'Feel the good energy' },
+        metadata: { advertiser: 'Z Energy', color: '#FF6900', tagline: 'Feel the good energy', url: 'https://www.z.co.nz' },
       });
     }
 
@@ -90,7 +90,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition' },
+        metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition', url: 'https://www.asb.co.nz' },
       });
     }
 
@@ -110,7 +110,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people' },
+        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
       });
     }
 

@@ -12,10 +12,7 @@ interface WaitPoint {
 
 const defaultPoints: WaitPoint[] = [
   { name: 'K Road intersection', duration: 5, type: 'congested' },
-  { name: 'Ponsonby Road', duration: 2, type: 'slow' },
   { name: 'Grafton Bridge', duration: 4, type: 'incident' },
-  { name: 'Symonds Street', duration: 1, type: 'clear' },
-  { name: 'Queen Street', duration: 3, type: 'slow' },
 ];
 
 const typeColors: Record<string, string> = {
