@@ -3,7 +3,6 @@
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { Play, Pause, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { useJourney } from '@/lib/stores/journey';
 import { SegmentDisplay } from './SegmentDisplay';
 import { RadioPlayer } from './RadioPlayer';
@@ -104,7 +103,7 @@ export function JourneyPlayer() {
         />
       ) : (
         <>
-          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} onClose={handleClose} />
+          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} onClose={handleClose} progress={progress} />
           {currentSegment.type === 'entertainment' && currentSegment.metadata?.streamUrl && (
             <RadioPlayer
               streamUrl={currentSegment.metadata.streamUrl as string}
@@ -115,31 +114,16 @@ export function JourneyPlayer() {
         </>
       )}
 
-      {/* Progress bar — tight under captions */}
-      {currentSegment.type !== 'ad' && (
-        <div className="space-y-1">
-          <Progress value={progress} className="h-1.5" />
-          <div className="flex justify-between text-sm sm:text-xs text-muted-foreground">
-            <span>
-              {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
-            </span>
-            <span>
-              {Math.floor(currentSegment.duration / 60)}:{String(currentSegment.duration % 60).padStart(2, '0')}
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Personalisation prompt */}
       <PersonalisePrompt segmentType={completedSegmentType} />
 
       <QueueList segments={segments} currentIndex={currentSegmentIndex} onJump={jumpToSegment} />
 
-      {/* Floating play/pause + skip button — bottom right, skip overlaps top-left */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Floating skip + play/pause buttons — bottom right, inline */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-[10%]">
         <button
           onClick={skipSegment}
-          className="absolute -top-5 -left-5 sm:-top-3 sm:-left-3 flex h-[3.75rem] w-[3.75rem] sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
+          className="flex h-[3.75rem] w-[3.75rem] sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
         >
           <SkipForward className="h-6 w-6 sm:h-3.5 sm:w-3.5" />
         </button>

@@ -1,40 +1,23 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { Car, Cloud, Newspaper, Radio, Megaphone, Trophy, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 import { TrafficOverlay } from './TrafficOverlay';
 import { WeatherCarousel } from './WeatherCarousel';
 import { StoryImages } from './StoryImages';
 
-const segmentIcons: Record<string, React.ElementType> = {
-  traffic: Car,
-  weather: Cloud,
-  news: Newspaper,
-  sport: Trophy,
-  entertainment: Radio,
-  ad: Megaphone,
-};
-
-const segmentColors: Record<string, string> = {
-  traffic: 'text-orange-400',
-  weather: 'text-sky-400',
-  news: 'text-red-400',
-  sport: 'text-green-400',
-  entertainment: 'text-purple-400',
-  ad: 'text-muted-foreground',
-};
 
 interface SegmentDisplayProps {
   segment: JourneySegment;
   elapsedTime: number;
   onClose?: () => void;
+  progress?: number;
 }
 
-export function SegmentDisplay({ segment, elapsedTime, onClose }: SegmentDisplayProps) {
-  const Icon = segmentIcons[segment.type] || Radio;
-  const color = segmentColors[segment.type] || 'text-foreground';
+export function SegmentDisplay({ segment, elapsedTime, onClose, progress }: SegmentDisplayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeWordRef = useRef<HTMLSpanElement>(null);
 
@@ -61,11 +44,8 @@ export function SegmentDisplay({ segment, elapsedTime, onClose }: SegmentDisplay
   }, [currentWordIndex]);
 
   return (
-    <div className="flex flex-col items-center gap-3 py-2">
+    <div className="flex flex-col gap-3 py-2">
       <div className="flex items-center gap-3 w-full">
-        <div className={cn('rounded-lg bg-secondary p-2.5 sm:p-2', color)}>
-          <Icon className="h-6 w-6 sm:h-5 sm:w-5" />
-        </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-lg sm:text-base font-semibold leading-tight truncate">{segment.title}</h2>
           <p className="text-sm sm:text-xs text-muted-foreground">
@@ -81,6 +61,21 @@ export function SegmentDisplay({ segment, elapsedTime, onClose }: SegmentDisplay
           </button>
         )}
       </div>
+
+      {/* Progress bar under header */}
+      {progress !== undefined && (
+        <div className="space-y-1">
+          <Progress value={progress} className="h-1.5" />
+          <div className="flex justify-between text-sm sm:text-xs text-muted-foreground">
+            <span>
+              {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
+            </span>
+            <span>
+              {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+      )}
       {/* Live captions — 3 lines visible */}
       {segment.script && words.length > 0 && (
         <div
