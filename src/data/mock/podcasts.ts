@@ -2,15 +2,6 @@ import { Podcast } from '@/lib/types';
 
 export const podcasts: Podcast[] = [
   {
-    id: 'zb-mike-hosking',
-    name: 'Mike Hosking Breakfast',
-    host: 'Mike Hosking',
-    description: 'The biggest issues of the day discussed with New Zealand\'s most-listened-to broadcaster.',
-    category: 'News & Current Affairs',
-    episodeCount: 1240,
-    latestEpisode: { title: 'PM announces infrastructure spending boost', duration: 480, date: '2026-02-14' },
-  },
-  {
     id: 'the-edge-morning',
     name: 'The Edge Mornings',
     host: 'Clint, Jono & Brodi',
@@ -36,15 +27,6 @@ export const podcasts: Podcast[] = [
     category: 'Society & Culture',
     episodeCount: 156,
     latestEpisode: { title: 'Living off-grid in the Coromandel', duration: 1800, date: '2026-02-12' },
-  },
-  {
-    id: 'sport-wrap',
-    name: 'Sports Wrap',
-    host: 'Jason Pine',
-    description: 'All the NZ and international sports results, analysis, and interviews you need.',
-    category: 'Sports',
-    episodeCount: 520,
-    latestEpisode: { title: 'Black Caps test squad named for England tour', duration: 900, date: '2026-02-14' },
   },
   {
     id: 'parenting-hell-nz',

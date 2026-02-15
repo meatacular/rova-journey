@@ -53,9 +53,11 @@ export function EntertainmentPrefs() {
               onClick={() => setStationId(station.id)}
             >
               <div
-                className="mb-2 h-1.5 w-8 rounded-full"
+                className="mb-2 h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
                 style={{ backgroundColor: station.color }}
-              />
+              >
+                {station.name.charAt(0)}
+              </div>
               <p className="text-sm font-semibold">{station.name}</p>
               <p className="text-xs text-muted-foreground">{station.genre}</p>
             </Card>

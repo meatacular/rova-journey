@@ -17,6 +17,9 @@ export function MusicBedPrefs() {
 
   return (
     <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Choose the vibe of the music under your traffic, weather and news.
+      </p>
       <div className="grid grid-cols-3 gap-2">
         {modes.map((mode) => (
           <button

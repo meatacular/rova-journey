@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Car, Cloud, Newspaper, Megaphone, Radio, ChevronRight } from 'lucide-react';
+import { Car, ChevronRight, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { AppShell } from '@/components/layout/AppShell';
-import { JourneyHero } from '@/components/journey/JourneyHero';
 import { usePreferences } from '@/lib/stores/preferences';
 import { useJourney } from '@/lib/stores/journey';
 import { stations } from '@/data/mock/stations';
@@ -12,6 +14,7 @@ import { podcasts } from '@/data/mock/podcasts';
 import { trafficRoutes } from '@/data/mock/traffic';
 import { scripts } from '@/data/mock/scripts';
 import { JourneySegment } from '@/lib/types';
+import { toast } from 'sonner';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -20,18 +23,23 @@ function getGreeting() {
   return 'Good evening';
 }
 
-const segmentPreviewIcons: Record<string, React.ElementType> = {
-  traffic: Car,
-  weather: Cloud,
-  news: Newspaper,
-  ad: Megaphone,
-  entertainment: Radio,
-};
+// Mock featured content
+const featured = [
+  { title: 'Win tickets to see Hilary Duff live in NZ!', type: 'Event', image: '🎤' },
+  { title: "Lorde's new album — What to know", type: 'Story', image: '🎵' },
+];
+
+const shorts = [
+  { title: 'Linda on Valentines', color: '#e31937' },
+  { title: 'Guess the Artist', color: '#6b2fa0' },
+  { title: 'Morning Laughs', color: '#e91e8c' },
+];
 
 export default function HomePage() {
   const router = useRouter();
   const prefs = usePreferences();
   const { buildJourney, startJourney } = useJourney();
+  const [toastShown, setToastShown] = useState(false);
 
   const cityName =
     prefs.city === 'auckland'
@@ -47,41 +55,11 @@ export default function HomePage() {
   const entertainmentName =
     prefs.entertainment.type === 'station' ? station?.name || 'The Edge' : podcast?.name || 'Podcast';
 
-  // Build segment preview
-  const segmentPreview: { type: string; label: string }[] = [];
-  if (prefs.traffic.enabled) {
-    segmentPreview.push({ type: 'traffic', label: 'Traffic' });
-    segmentPreview.push({ type: 'ad', label: 'Ad' });
-  }
-  if (prefs.weather.enabled) {
-    segmentPreview.push({ type: 'weather', label: 'Weather' });
-    segmentPreview.push({ type: 'ad', label: 'Ad' });
-  }
-  if (prefs.news.enabled) {
-    segmentPreview.push({ type: 'news', label: 'News' });
-    segmentPreview.push({ type: 'ad', label: 'Ad' });
-  }
-  segmentPreview.push({ type: 'entertainment', label: entertainmentName });
-
-  // Estimate duration
-  const estimatedDuration = segmentPreview.reduce((acc, seg) => {
-    if (seg.type === 'ad') return acc + 0.25;
-    if (seg.type === 'traffic') return acc + 1.5;
-    if (seg.type === 'weather') return acc + 1;
-    if (seg.type === 'news') {
-      if (prefs.news.length === 'brief') return acc + 0.5;
-      if (prefs.news.length === 'detailed') return acc + 1.5;
-      return acc + 1;
-    }
-    return acc + 5;
-  }, 0);
-
   const handleStartJourney = () => {
     const segments: JourneySegment[] = [];
     let id = 0;
     const adScripts = scripts.ad;
     let adIdx = 0;
-
     const cityKey = prefs.city as keyof typeof scripts.traffic;
 
     if (prefs.traffic.enabled) {
@@ -159,60 +137,133 @@ export default function HomePage() {
     router.push('/journey');
   };
 
+  // Show "car connected" toast on load
+  useEffect(() => {
+    if (toastShown) return;
+    setToastShown(true);
+    const timer = setTimeout(() => {
+      toast('Car connected — start journey?', {
+        duration: 8000,
+        action: {
+          label: 'Start',
+          onClick: () => handleStartJourney(),
+        },
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Category tabs
+  const tabs = ['For you', 'Radio', 'Podcasts', 'Videos', 'Articles'];
+  const [activeTab, setActiveTab] = useState('For you');
+
   return (
     <AppShell>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {getGreeting()}, {cityName}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your personalised audio journey is ready
-          </p>
+        {/* Category pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 no-scrollbar">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === tab
+                  ? 'bg-white text-black'
+                  : 'bg-secondary text-muted-foreground hover:bg-accent'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
-        <JourneyHero onStart={handleStartJourney} estimatedDuration={Math.round(estimatedDuration)} />
-
-        {/* Quick settings */}
-        <div className="flex flex-wrap gap-2">
-          <Badge variant={prefs.traffic.enabled ? 'default' : 'outline'} className="text-xs">
-            Traffic {prefs.traffic.enabled ? 'ON' : 'OFF'}
-          </Badge>
-          <Badge variant={prefs.weather.enabled ? 'default' : 'outline'} className="text-xs">
-            Weather {prefs.weather.enabled ? 'ON' : 'OFF'}
-          </Badge>
-          <Badge variant={prefs.news.enabled ? 'default' : 'outline'} className="text-xs">
-            News · {prefs.news.length}
-          </Badge>
-        </div>
-
-        {/* Segment preview */}
+        {/* Featured section */}
         <div>
-          <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
-            Your journey lineup
-          </h2>
-          <div className="space-y-1">
-            {segmentPreview.map((seg, i) => {
-              const Icon = segmentPreviewIcons[seg.type] || Radio;
-              return (
-                <div key={i} className="flex items-center gap-3 rounded-lg bg-secondary/50 px-3 py-2">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{seg.label}</span>
-                  {i < segmentPreview.length - 1 && (
-                    <ChevronRight className="ml-auto h-3 w-3 text-muted-foreground/50" />
-                  )}
+          <h2 className="text-xl font-bold mb-3">Featured</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar">
+            {featured.map((item, i) => (
+              <Card
+                key={i}
+                className="shrink-0 w-[280px] border-0 bg-secondary/50 overflow-hidden cursor-pointer hover:bg-secondary transition-colors"
+              >
+                <div className="h-40 bg-gradient-to-br from-primary/20 to-secondary flex items-center justify-center text-6xl">
+                  {item.image}
                 </div>
-              );
-            })}
+                <div className="p-3">
+                  <p className="text-xs text-muted-foreground">{item.type}</p>
+                  <p className="text-sm font-semibold mt-1 line-clamp-2">{item.title}</p>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
 
-        {/* Traffic preview for selected city */}
+        {/* Start Journey CTA */}
+        <Card className="border-0 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/50">
+          <div className="p-5">
+            <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
+              <Car className="h-3.5 w-3.5" />
+              <span>{prefs.homeAddress}</span>
+              <ChevronRight className="h-3 w-3" />
+              <span>{prefs.workAddress}</span>
+            </div>
+            <h2 className="text-lg font-bold mb-1">{getGreeting()}, {cityName}</h2>
+            <p className="text-sm text-muted-foreground mb-4">Your personalised journey is ready</p>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+              {prefs.traffic.enabled && (
+                <Badge variant="outline" className="text-xs bg-background/50">Traffic</Badge>
+              )}
+              {prefs.weather.enabled && (
+                <Badge variant="outline" className="text-xs bg-background/50">Weather</Badge>
+              )}
+              {prefs.news.enabled && (
+                <Badge variant="outline" className="text-xs bg-background/50">News · {prefs.news.length}</Badge>
+              )}
+              {prefs.sport?.enabled && (
+                <Badge variant="outline" className="text-xs bg-background/50">Sport</Badge>
+              )}
+              <Badge variant="outline" className="text-xs bg-background/50">{entertainmentName}</Badge>
+            </div>
+
+            <Button
+              onClick={handleStartJourney}
+              className="w-full text-base font-semibold"
+              size="lg"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Start Journey
+            </Button>
+          </div>
+        </Card>
+
+        {/* Shorts / Quick content */}
+        <div>
+          <h2 className="text-xl font-bold mb-3">Shorts</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar">
+            {shorts.map((item, i) => (
+              <div
+                key={i}
+                className="shrink-0 w-[140px] h-[200px] rounded-2xl overflow-hidden relative cursor-pointer"
+                style={{ backgroundColor: item.color }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <p className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white leading-tight">
+                  {item.title}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Traffic preview */}
         {prefs.traffic.enabled && trafficRoutes[prefs.city] && (
-          <div className="rounded-xl bg-secondary/50 p-4">
-            <h2 className="mb-2 text-sm font-semibold">
-              Route Preview
-            </h2>
+          <Card className="border-0 bg-secondary/50 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Car className="h-4 w-4 text-orange-400" />
+              <h2 className="text-sm font-semibold">Route</h2>
+            </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{trafficRoutes[prefs.city].from}</span>
               <ChevronRight className="h-3 w-3" />
@@ -226,12 +277,7 @@ export default function HomePage() {
                 {' '}(usually {trafficRoutes[prefs.city].normalDuration} min)
               </span>
             </p>
-            {trafficRoutes[prefs.city].returnJourney && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                Return tonight: ~{trafficRoutes[prefs.city].returnJourney.currentDuration} min
-              </p>
-            )}
-          </div>
+          </Card>
         )}
       </div>
     </AppShell>

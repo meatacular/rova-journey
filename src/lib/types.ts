@@ -5,6 +5,7 @@ export interface Station {
   color: string;
   tagline: string;
   city?: string;
+  logo: string;
 }
 
 export interface Podcast {
@@ -82,6 +83,8 @@ export interface NewsItem {
 
 export type NewsCategory = 'nz' | 'sport' | 'politics' | 'entertainment' | 'business' | 'tech' | 'crime' | 'world';
 
+export type SportCategory = 'rugby' | 'cricket' | 'league' | 'football' | 'netball' | 'tennis' | 'motorsport' | 'other';
+
 export interface Voice {
   id: string;
   name: string;
@@ -89,6 +92,7 @@ export interface Voice {
   personality: string;
   station?: string;
   avatar: string;
+  photo: string;
 }
 
 export interface MusicBed {
@@ -128,6 +132,16 @@ export interface UserPreferences {
     categories: NewsCategory[];
     length: NewsLength;
   };
+  sport: {
+    enabled: boolean;
+    categories: SportCategory[];
+    length: NewsLength;
+  };
+  calendar: {
+    connected: boolean;
+    provider: 'google' | 'apple' | 'microsoft' | null;
+  };
+  voiceSpeed: number;
   entertainment: {
     type: 'station' | 'podcast';
     stationId: string;
