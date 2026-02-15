@@ -25,7 +25,7 @@ export function SegmentTabBar({ segments, currentIndex, onJump }: SegmentTabBarP
     .filter(({ segment }) => segment.type !== 'ad');
 
   return (
-    <div className="flex items-center justify-center gap-1 py-2">
+    <div className="flex items-center justify-center gap-1 py-0.5">
       {tabs.map(({ segment, originalIndex }) => {
         const Icon = segmentIcons[segment.type];
         if (!Icon) return null;

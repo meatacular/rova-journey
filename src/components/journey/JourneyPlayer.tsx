@@ -85,7 +85,7 @@ export function JourneyPlayer() {
   const handlePlayPause = isPlaying ? pauseJourney : resumeJourney;
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-2 pb-20">
       {/* Segment tab bar */}
       <SegmentTabBar
         segments={segments}
@@ -119,19 +119,21 @@ export function JourneyPlayer() {
 
       <QueueList segments={segments} currentIndex={currentSegmentIndex} onJump={jumpToSegment} />
 
-      {/* Floating skip + play/pause buttons — bottom right, inline */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-[10%]">
-        <button
-          onClick={skipSegment}
-          className="flex h-[3.75rem] w-[3.75rem] sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
-        >
-          <SkipForward className="h-6 w-6 sm:h-3.5 sm:w-3.5" />
-        </button>
+      {/* Floating play/pause + skip buttons — bottom right, overlapping */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center">
+        {/* Play/pause sits behind, shifted left by 10% of button size */}
         <button
           onClick={handlePlayPause}
-          className="flex h-[5.75rem] w-[5.75rem] sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
+          className="flex h-16 w-16 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
         >
-          {isPlaying ? <Pause className="h-10 w-10 sm:h-6 sm:w-6" /> : <Play className="h-10 w-10 sm:h-6 sm:w-6 ml-0.5" />}
+          {isPlaying ? <Pause className="h-7 w-7 sm:h-5 sm:w-5" /> : <Play className="h-7 w-7 sm:h-5 sm:w-5 ml-0.5" />}
+        </button>
+        {/* Skip overlaps on top, pulled left 10% over the play button */}
+        <button
+          onClick={skipSegment}
+          className="-ml-[10%] z-10 flex h-16 w-16 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/15 text-foreground backdrop-blur-xl border border-white/20 shadow-lg shadow-black/10 transition-transform active:scale-95"
+        >
+          <SkipForward className="h-7 w-7 sm:h-5 sm:w-5" />
         </button>
       </div>
     </div>
