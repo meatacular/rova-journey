@@ -3,6 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 19.2px; /* 16px × 1.2 = 20% larger on mobile */
+  }
+
+  @media (min-width: 640px) {
+    html {
+      font-size: 16px; /* default on desktop */
+    }
+  }
+
   :root {
     --background: 0 0% 4%;
     --foreground: 0 0% 95%;
