@@ -32,7 +32,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/rova-logo.png" alt="rova" width={28} height={28} />
-          <span className="text-xl font-bold tracking-tight text-foreground">journeys</span>
+          <span className="text-xl font-bold tracking-tight text-foreground">rova</span>
         </Link>
         <div className="flex items-center gap-2">
           <Button
