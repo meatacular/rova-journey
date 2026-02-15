@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-import { Play, Pause, SkipForward, X } from 'lucide-react';
+import { Play, Pause, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useJourney } from '@/lib/stores/journey';
@@ -70,13 +70,6 @@ export function JourneyPlayer() {
 
   return (
     <div className="space-y-4 pb-20">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl sm:text-lg font-semibold">Now Playing</h1>
-        <Button variant="ghost" size="icon" onClick={handleClose}>
-          <X className="h-5 w-5" />
-        </Button>
-      </div>
-
       {currentSegment.type === 'ad' ? (
         <AdBreak
           script={currentSegment.script || ''}
@@ -87,7 +80,7 @@ export function JourneyPlayer() {
         />
       ) : (
         <>
-          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} />
+          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} onClose={handleClose} />
           {currentSegment.type === 'entertainment' && currentSegment.metadata?.streamUrl && (
             <RadioPlayer
               streamUrl={currentSegment.metadata.streamUrl as string}

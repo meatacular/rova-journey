@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { Car, Cloud, Newspaper, Radio, Megaphone, Trophy } from 'lucide-react';
+import { Car, Cloud, Newspaper, Radio, Megaphone, Trophy, X } from 'lucide-react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { TrafficOverlay } from './TrafficOverlay';
@@ -29,9 +29,10 @@ const segmentColors: Record<string, string> = {
 interface SegmentDisplayProps {
   segment: JourneySegment;
   elapsedTime: number;
+  onClose?: () => void;
 }
 
-export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
+export function SegmentDisplay({ segment, elapsedTime, onClose }: SegmentDisplayProps) {
   const Icon = segmentIcons[segment.type] || Radio;
   const color = segmentColors[segment.type] || 'text-foreground';
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -61,16 +62,24 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
 
   return (
     <div className="flex flex-col items-center gap-3 py-2">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 w-full">
         <div className={cn('rounded-lg bg-secondary p-2.5 sm:p-2', color)}>
           <Icon className="h-6 w-6 sm:h-5 sm:w-5" />
         </div>
-        <div>
-          <h2 className="text-lg sm:text-base font-semibold leading-tight">{segment.title}</h2>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg sm:text-base font-semibold leading-tight truncate">{segment.title}</h2>
           <p className="text-sm sm:text-xs text-muted-foreground">
             {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
           </p>
         </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground shrink-0"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
       {/* Live captions — 3 lines visible */}
       {segment.script && words.length > 0 && (
