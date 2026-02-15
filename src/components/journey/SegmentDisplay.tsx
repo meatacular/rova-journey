@@ -39,8 +39,8 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
 
   const words = segment.script ? segment.script.split(/\s+/) : [];
   const totalWords = words.length;
-  // Calculate which word should be highlighted based on elapsed time
-  const wordsPerSecond = (totalWords / segment.duration) * 2.5;
+  // Pace words across the full segment duration
+  const wordsPerSecond = totalWords > 0 ? totalWords / segment.duration : 0;
   const currentWordIndex = Math.min(Math.floor(elapsedTime * wordsPerSecond), totalWords - 1);
 
   // Auto-scroll transcript container only (not the page)

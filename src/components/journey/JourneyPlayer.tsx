@@ -118,19 +118,19 @@ export function JourneyPlayer() {
 
       <QueueList segments={segments} currentIndex={currentSegmentIndex} />
 
-      {/* Floating play/pause + skip button — bottom right */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-1.5">
+      {/* Floating play/pause + skip button — bottom right, skip overlaps top-left */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={skipSegment}
+          className="absolute -top-3 -left-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/80 text-primary-foreground shadow-md transition-transform active:scale-95"
+        >
+          <SkipForward className="h-3.5 w-3.5" />
+        </button>
         <button
           onClick={handlePlayPause}
           className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
         >
           {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
-        </button>
-        <button
-          onClick={skipSegment}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/80 text-primary-foreground shadow-md transition-transform active:scale-95"
-        >
-          <SkipForward className="h-4 w-4" />
         </button>
       </div>
     </div>
