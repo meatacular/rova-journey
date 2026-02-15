@@ -43,18 +43,19 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
   const wordsPerSecond = (totalWords / segment.duration) * 2.5;
   const currentWordIndex = Math.min(Math.floor(elapsedTime * wordsPerSecond), totalWords - 1);
 
-  // Auto-scroll to keep current word visible
+  // Auto-scroll transcript container only (not the page)
   useEffect(() => {
     if (activeWordRef.current && scrollRef.current) {
       const container = scrollRef.current;
       const word = activeWordRef.current;
-      const containerRect = container.getBoundingClientRect();
-      const wordRect = word.getBoundingClientRect();
+      const wordTop = word.offsetTop;
+      const containerHeight = container.clientHeight;
 
-      // If the word is below the visible area or above, scroll to center it
-      if (wordRect.top > containerRect.bottom - 40 || wordRect.top < containerRect.top + 20) {
-        word.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      // Scroll within the container to keep the word centered
+      container.scrollTo({
+        top: wordTop - containerHeight / 2,
+        behavior: 'smooth',
+      });
     }
   }, [currentWordIndex]);
 
