@@ -1,12 +1,28 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { TrafficOverlay } from './TrafficOverlay';
 import { WeatherCarousel } from './WeatherCarousel';
 import { StoryImages } from './StoryImages';
+
+/** Hook: returns true when a text element overflows its container */
+function useOverflow(ref: React.RefObject<HTMLElement | null>) {
+  const [overflows, setOverflows] = useState(false);
+  const check = useCallback(() => {
+    if (ref.current) {
+      setOverflows(ref.current.scrollWidth > ref.current.clientWidth);
+    }
+  }, [ref]);
+  useEffect(() => {
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, [check]);
+  return overflows;
+}
 
 
 interface SegmentDisplayProps {
@@ -16,6 +32,8 @@ interface SegmentDisplayProps {
 }
 
 export function SegmentDisplay({ segment, elapsedTime, progress }: SegmentDisplayProps) {
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleOverflows = useOverflow(titleRef);
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeWordRef = useRef<HTMLSpanElement>(null);
 
@@ -42,8 +60,19 @@ export function SegmentDisplay({ segment, elapsedTime, progress }: SegmentDispla
 
   return (
     <div className="flex flex-col gap-3 py-2">
-      <div className="w-full">
-        <h2 className="text-lg sm:text-base font-semibold leading-tight truncate">{segment.title}</h2>
+      <div className="w-full overflow-hidden">
+        <div className="overflow-hidden">
+          <h2
+            ref={titleRef}
+            className={cn(
+              'text-lg sm:text-base font-semibold leading-tight whitespace-nowrap inline-flex',
+              titleOverflows && 'animate-marquee'
+            )}
+          >
+            <span>{segment.title}</span>
+            {titleOverflows && <span className="pl-12">{segment.title}</span>}
+          </h2>
+        </div>
         <p className="text-sm sm:text-xs text-muted-foreground">
           {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
         </p>

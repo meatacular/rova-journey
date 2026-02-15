@@ -11,6 +11,7 @@ import { AdBreak } from './AdBreak';
 import { QueueList } from './QueueList';
 import { SegmentTabBar } from './SegmentTabBar';
 import { PersonalisePrompt } from './PersonalisePrompt';
+import { CalendarCard } from './CalendarCard';
 import { useRouter } from 'next/navigation';
 import { SegmentType } from '@/lib/types';
 
@@ -130,6 +131,7 @@ export function JourneyPlayer() {
               artwork={currentSegment.metadata.podcastArtwork as string}
             />
           )}
+          {currentSegment.type === 'entertainment' && <CalendarCard />}
         </>
       )}
 
