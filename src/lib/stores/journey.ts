@@ -11,6 +11,7 @@ interface JourneyStore extends JourneyState {
   skipSegment: () => void;
   completeSegment: () => void;
   nextSegment: () => void;
+  jumpToSegment: (index: number) => void;
   setElapsedTime: (time: number) => void;
   resetJourney: () => void;
 }
@@ -99,6 +100,25 @@ export const useJourney = create<JourneyStore>((set, get) => ({
 
   nextSegment: () => {
     get().completeSegment();
+  },
+
+  jumpToSegment: (index) => {
+    const { segments } = get();
+    if (index < 0 || index >= segments.length) return;
+    const updated = segments.map((s, i) => ({
+      ...s,
+      status:
+        i < index
+          ? ('done' as const)
+          : i === index
+            ? ('playing' as const)
+            : ('upcoming' as const),
+    }));
+    set({
+      segments: updated,
+      currentSegmentIndex: index,
+      elapsedTime: 0,
+    });
   },
 
   setElapsedTime: (time) => set({ elapsedTime: time }),

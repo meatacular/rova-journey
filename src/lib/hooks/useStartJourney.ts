@@ -154,10 +154,117 @@ export function useStartJourney() {
     router.push('/journey');
   };
 
+  const startGeneric = (destination: string) => {
+    const segments: JourneySegment[] = [];
+    let id = 0;
+    const adScripts = scripts.ad;
+    let adIdx = 0;
+    const cityKey = prefs.city as keyof typeof scripts.traffic;
+    const label = destination || 'your destination';
+
+    // Traffic
+    segments.push({
+      id: String(id++),
+      type: 'traffic',
+      title: `Traffic to ${label}`,
+      duration: 90,
+      script: scripts.traffic[cityKey] || scripts.traffic.auckland,
+      status: 'upcoming',
+    });
+    segments.push({
+      id: String(id++),
+      type: 'ad',
+      title: 'Ad Break',
+      duration: 15,
+      script: adScripts[adIdx++ % adScripts.length],
+      status: 'upcoming',
+      metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
+    });
+
+    // Weather
+    segments.push({
+      id: String(id++),
+      type: 'weather',
+      title: `Weather for ${label}`,
+      duration: 60,
+      script: scripts.weather[cityKey] || scripts.weather.auckland,
+      status: 'upcoming',
+    });
+    segments.push({
+      id: String(id++),
+      type: 'ad',
+      title: 'Ad Break',
+      duration: 15,
+      script: adScripts[adIdx++ % adScripts.length],
+      status: 'upcoming',
+      metadata: { advertiser: 'Z Energy', color: '#FF6900', tagline: 'Feel the good energy', url: 'https://www.z.co.nz' },
+    });
+
+    // News
+    segments.push({
+      id: String(id++),
+      type: 'news',
+      title: 'Your News — Black Caps lineup announced',
+      duration: 60,
+      script: scripts.news.standard,
+      status: 'upcoming',
+    });
+    segments.push({
+      id: String(id++),
+      type: 'ad',
+      title: 'Ad Break',
+      duration: 15,
+      script: adScripts[adIdx++ % adScripts.length],
+      status: 'upcoming',
+      metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition', url: 'https://www.asb.co.nz' },
+    });
+
+    // Sport
+    segments.push({
+      id: String(id++),
+      type: 'sport' as SegmentType,
+      title: 'Sport — Silver Ferns claim Constellation Cup',
+      duration: 60,
+      script: "Sport now — Cricket New Zealand has named the Black Caps squad for the upcoming test series in England. Kane Williamson returns to captain the side. And the Silver Ferns have claimed the Constellation Cup with a dramatic 58-56 win over Australia in Melbourne.",
+      status: 'upcoming',
+    });
+    segments.push({
+      id: String(id++),
+      type: 'ad',
+      title: 'Ad Break',
+      duration: 15,
+      script: adScripts[adIdx++ % adScripts.length],
+      status: 'upcoming',
+      metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
+    });
+
+    // Entertainment
+    segments.push({
+      id: String(id++),
+      type: 'entertainment',
+      title: entertainmentName,
+      duration: 300,
+      script:
+        prefs.entertainment.type === 'station'
+          ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
+          : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
+      status: 'upcoming',
+      metadata: {
+        streamUrl: station?.streamUrl,
+        stationColor: station?.color,
+      },
+    });
+
+    buildJourney(segments);
+    startJourney();
+    router.push('/journey');
+  };
+
   return {
     handleStartJourney,
     startFromPreset,
     startDefault,
+    startGeneric,
     entertainmentName,
     showSplash,
     setShowSplash,

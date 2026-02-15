@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Car, ChevronRight, Play } from 'lucide-react';
+import { Car, ChevronRight, Play, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -42,8 +42,10 @@ const headlines = [
 
 export default function HomePage() {
   const prefs = usePreferences();
-  const { handleStartJourney, startFromPreset, entertainmentName, showSplash, setShowSplash } = useStartJourney();
+  const { handleStartJourney, startFromPreset, startGeneric, entertainmentName, showSplash, setShowSplash } = useStartJourney();
   const [showModal, setShowModal] = useState(false);
+  const [modalStep, setModalStep] = useState<'welcome' | 'destination'>('welcome');
+  const [destination, setDestination] = useState('');
 
   const cityName =
     prefs.city === 'auckland'
@@ -65,14 +67,6 @@ export default function HomePage() {
   // Category tabs
   const tabs = ['For you', 'Radio', 'Podcasts', 'Videos', 'Articles'];
   const [activeTab, setActiveTab] = useState('For you');
-
-  const segmentBadges = [
-    prefs.traffic.enabled && 'Traffic',
-    prefs.weather.enabled && 'Weather',
-    prefs.news.enabled && 'News',
-    prefs.sport?.enabled && 'Sport',
-    'Entertainment',
-  ].filter(Boolean);
 
   return (
     <AppShell>
@@ -237,54 +231,86 @@ export default function HomePage() {
       {showModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
-          onClick={() => setShowModal(false)}
+          onClick={() => { setShowModal(false); setModalStep('welcome'); }}
         >
           <div
             className="w-full max-w-sm mx-4 rounded-2xl bg-card border border-border p-6 text-center animate-in zoom-in-95 fade-in duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Car icon */}
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Car className="h-8 w-8 text-primary" />
-            </div>
+            {modalStep === 'welcome' ? (
+              <>
+                {/* Car icon */}
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <Car className="h-8 w-8 text-primary" />
+                </div>
 
-            {/* Title */}
-            <h2 className="text-xl font-bold mb-1">Car Connected</h2>
-            <p className="text-sm text-muted-foreground mb-5">Your personalised journey is ready</p>
+                <h2 className="text-xl font-bold mb-1">Car Connected</h2>
+                <p className="text-sm text-muted-foreground mb-6">Level up your ride with rova journey!</p>
 
-            {/* Route display */}
-            <div className="flex items-center justify-center gap-2 mb-5 text-sm text-muted-foreground">
-              <span>{prefs.homeAddress}</span>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <span>{prefs.workAddress}</span>
-            </div>
+                <Button
+                  onClick={() => setModalStep('destination')}
+                  className="w-full text-base font-semibold bg-primary hover:bg-primary/90"
+                  size="lg"
+                >
+                  Let&apos;s go
+                </Button>
 
-            {/* Segment badges */}
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
-              {segmentBadges.map((label) => (
-                <Badge key={label as string} variant="outline" className="text-xs bg-background/50">
-                  {label}
-                </Badge>
-              ))}
-            </div>
+                <button
+                  onClick={() => { setShowModal(false); setModalStep('welcome'); }}
+                  className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Not now
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Destination icon */}
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <MapPin className="h-8 w-8 text-primary" />
+                </div>
 
-            {/* Start Journey button */}
-            <Button
-              onClick={handleStartJourney}
-              className="w-full text-base font-semibold bg-primary hover:bg-primary/90"
-              size="lg"
-            >
-              <Play className="mr-2 h-5 w-5" />
-              Start Journey
-            </Button>
+                <h2 className="text-xl font-bold mb-1">Where are you heading?</h2>
+                <p className="text-sm text-muted-foreground mb-4">We&apos;ll build your first journey</p>
 
-            {/* Not now link */}
-            <button
-              onClick={() => setShowModal(false)}
-              className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Not now
-            </button>
+                <input
+                  type="text"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder="Auckland CBD"
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 mb-4"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && destination.trim()) {
+                      setShowModal(false);
+                      setModalStep('welcome');
+                      startGeneric(destination.trim());
+                    }
+                  }}
+                />
+
+                <Button
+                  onClick={() => {
+                    if (!destination.trim()) return;
+                    setShowModal(false);
+                    setModalStep('welcome');
+                    startGeneric(destination.trim());
+                  }}
+                  className="w-full text-base font-semibold bg-primary hover:bg-primary/90"
+                  size="lg"
+                  disabled={!destination.trim()}
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  Start
+                </Button>
+
+                <button
+                  onClick={() => setModalStep('welcome')}
+                  className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Back
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

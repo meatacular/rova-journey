@@ -16,17 +16,20 @@ const segmentIcons: Record<string, React.ElementType> = {
 interface QueueItemProps {
   segment: JourneySegment;
   isActive: boolean;
+  onClick?: () => void;
 }
 
-export function QueueItem({ segment, isActive }: QueueItemProps) {
+export function QueueItem({ segment, isActive, onClick }: QueueItemProps) {
   const Icon = segmentIcons[segment.type] || Radio;
 
   return (
-    <div
+    <button
+      onClick={onClick}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',
+        'flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-colors text-left',
         isActive && 'bg-primary/10 ring-1 ring-primary/30',
-        segment.status === 'done' && 'opacity-50'
+        segment.status === 'done' && 'opacity-50',
+        onClick && 'cursor-pointer hover:bg-secondary/50'
       )}
     >
       <div
@@ -51,6 +54,6 @@ export function QueueItem({ segment, isActive }: QueueItemProps) {
           ? `${segment.duration}s`
           : `${Math.floor(segment.duration / 60)}:${String(segment.duration % 60).padStart(2, '0')}`}
       </span>
-    </div>
+    </button>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { WeatherRadar } from './WeatherRadar';
 import { usePreferences } from '@/lib/stores/preferences';
 import { weatherData } from '@/data/mock/weather';
@@ -10,6 +10,21 @@ export function WeatherCarousel() {
   const [page, setPage] = useState(0);
   const { city } = usePreferences();
   const data = weatherData[city];
+  const autoRotatePaused = useRef(false);
+
+  // Auto-rotate between radar and forecast every 3s
+  useEffect(() => {
+    if (autoRotatePaused.current) return;
+    const interval = setInterval(() => {
+      setPage((p) => (p === 0 ? 1 : 0));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [autoRotatePaused.current]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleManualToggle = useCallback((i: number) => {
+    autoRotatePaused.current = true;
+    setPage(i);
+  }, []);
 
   const pages = [
     { id: 'radar', label: 'Radar' },
@@ -53,7 +68,7 @@ export function WeatherCarousel() {
         {pages.map((p, i) => (
           <button
             key={p.id}
-            onClick={() => setPage(i)}
+            onClick={() => handleManualToggle(i)}
             className={cn(
               'rounded-full px-3 py-1 text-xs font-medium transition-colors',
               page === i

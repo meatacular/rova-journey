@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { Play, Pause, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -9,7 +9,10 @@ import { SegmentDisplay } from './SegmentDisplay';
 import { RadioPlayer } from './RadioPlayer';
 import { AdBreak } from './AdBreak';
 import { QueueList } from './QueueList';
+import { SegmentTabBar } from './SegmentTabBar';
+import { PersonalisePrompt } from './PersonalisePrompt';
 import { useRouter } from 'next/navigation';
+import { SegmentType } from '@/lib/types';
 
 export function JourneyPlayer() {
   const router = useRouter();
@@ -23,11 +26,25 @@ export function JourneyPlayer() {
     resumeJourney,
     skipSegment,
     completeSegment,
+    jumpToSegment,
     setElapsedTime,
     resetJourney,
   } = useJourney();
 
   const currentSegment = segments[currentSegmentIndex];
+  const prevIndexRef = useRef(currentSegmentIndex);
+  const [completedSegmentType, setCompletedSegmentType] = useState<SegmentType | null>(null);
+
+  // Track segment transitions for personalisation prompts
+  useEffect(() => {
+    if (prevIndexRef.current !== currentSegmentIndex && prevIndexRef.current < segments.length) {
+      const prevSegment = segments[prevIndexRef.current];
+      if (prevSegment && prevSegment.type !== 'ad') {
+        setCompletedSegmentType(prevSegment.type);
+      }
+    }
+    prevIndexRef.current = currentSegmentIndex;
+  }, [currentSegmentIndex, segments]);
 
   // Timer for non-ad segments
   useEffect(() => {
@@ -70,6 +87,13 @@ export function JourneyPlayer() {
 
   return (
     <div className="space-y-4 pb-20">
+      {/* Segment tab bar */}
+      <SegmentTabBar
+        segments={segments}
+        currentIndex={currentSegmentIndex}
+        onJump={jumpToSegment}
+      />
+
       {currentSegment.type === 'ad' ? (
         <AdBreak
           script={currentSegment.script || ''}
@@ -106,7 +130,10 @@ export function JourneyPlayer() {
         </div>
       )}
 
-      <QueueList segments={segments} currentIndex={currentSegmentIndex} />
+      {/* Personalisation prompt */}
+      <PersonalisePrompt segmentType={completedSegmentType} />
+
+      <QueueList segments={segments} currentIndex={currentSegmentIndex} onJump={jumpToSegment} />
 
       {/* Floating play/pause + skip button — bottom right, skip overlaps top-left */}
       <div className="fixed bottom-6 right-6 z-50">
