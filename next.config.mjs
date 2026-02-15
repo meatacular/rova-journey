@@ -2,6 +2,13 @@
 const nextConfig = {
   images: {
     dangerouslyAllowSVG: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.ctfassets.net',
+        pathname: '/**',
+      },
+    ],
   },
 };
 

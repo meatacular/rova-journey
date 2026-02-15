@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Megaphone } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 interface AdBreakProps {
@@ -9,9 +8,10 @@ interface AdBreakProps {
   duration: number;
   onComplete: () => void;
   isPaused: boolean;
+  metadata?: Record<string, unknown>;
 }
 
-export function AdBreak({ script, duration, onComplete, isPaused }: AdBreakProps) {
+export function AdBreak({ script, duration, onComplete, isPaused, metadata }: AdBreakProps) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -28,13 +28,19 @@ export function AdBreak({ script, duration, onComplete, isPaused }: AdBreakProps
 
   const remaining = duration - elapsed;
   const progress = (elapsed / duration) * 100;
+  const advertiser = metadata?.advertiser as string | undefined;
+  const adColor = (metadata?.color as string) || '#666';
+  const tagline = (metadata?.tagline as string) || script;
 
   return (
     <div className="flex flex-col items-center gap-4 py-8">
-      <div className="rounded-2xl bg-secondary p-5 text-muted-foreground">
-        <Megaphone className="h-10 w-10" />
+      <div
+        className="rounded-2xl p-6 flex items-center justify-center"
+        style={{ backgroundColor: adColor }}
+      >
+        <span className="text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
       </div>
-      <p className="text-center text-sm text-muted-foreground">{script}</p>
+      <p className="text-center text-sm text-muted-foreground">{tagline}</p>
       <div className="w-full max-w-xs space-y-2">
         <Progress value={progress} className="h-1.5" />
         <p className="text-center text-xs text-muted-foreground">

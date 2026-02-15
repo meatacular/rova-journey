@@ -103,7 +103,7 @@ export interface MusicBed {
   bpm: number;
 }
 
-export type SegmentType = 'traffic' | 'weather' | 'news' | 'entertainment' | 'ad';
+export type SegmentType = 'traffic' | 'weather' | 'news' | 'sport' | 'entertainment' | 'ad';
 
 export interface JourneySegment {
   id: string;

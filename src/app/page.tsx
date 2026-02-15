@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Car, ChevronRight, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,8 +14,7 @@ import { stations } from '@/data/mock/stations';
 import { podcasts } from '@/data/mock/podcasts';
 import { trafficRoutes } from '@/data/mock/traffic';
 import { scripts } from '@/data/mock/scripts';
-import { JourneySegment } from '@/lib/types';
-import { toast } from 'sonner';
+import { JourneySegment, SegmentType } from '@/lib/types';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -23,23 +23,32 @@ function getGreeting() {
   return 'Good evening';
 }
 
-// Mock featured content
+// Featured content with real rova.nz CDN images
 const featured = [
-  { title: 'Win tickets to see Hilary Duff live in NZ!', type: 'Event', image: '🎤' },
-  { title: "Lorde's new album — What to know", type: 'Story', image: '🎵' },
+  { title: 'Win tickets to see Hilary Duff live in NZ!', type: 'Event', image: 'https://images.ctfassets.net/r65x6q43xsmv/g9ybEC5t4XU80R9gfRLEn/6666da5becd21b1fd650f69d2d1186ea/Hilary-Duff-16x9.jpg' },
+  { title: "Lorde's new shows — What you need to know", type: 'Story', image: 'https://images.ctfassets.net/r65x6q43xsmv/6p5FlJdHZJWaAi9oycHNyl/358798253f22bd25ba462ac7278393ca/LordeNZshowsWhatYouNeedToKnow-HERO.jpg' },
+  { title: 'Jim Beam Homegrown Plus One Pact', type: 'Event', image: 'https://images.ctfassets.net/r65x6q43xsmv/5oDEfjLmmjl7ykKEoXAidV/d1f54de379b06a55a8c92c39e9b11f9c/RVA-Homegrown-PLus-One-Pact-1920x1080.png' },
 ];
 
 const shorts = [
-  { title: 'Linda on Valentines', color: '#e31937' },
-  { title: 'Guess the Artist', color: '#6b2fa0' },
-  { title: 'Morning Laughs', color: '#e91e8c' },
+  { title: 'Linda on Valentines', image: 'https://images.ctfassets.net/r65x6q43xsmv/2FaCnJfSGRgHvkgZSyfsg4/54056f6323dd87e528172c5b632e4f25/MultiCorder3_-_NDI_Suite5A__Cam6__-_20250213T100032.00_00_12_14.Still001.png' },
+  { title: 'Guess the Artist', image: 'https://images.ctfassets.net/r65x6q43xsmv/4GwxCbUfF72DK3XTmd7NI9/cf990c4e3db9c6c7d1e4b4f740338ab0/MultiCorder1_-_NDI_Suite5A__Cam1__-_20250211T152810.00_01_22_09.Still001.jpg' },
+  { title: 'ICK ICK ICK', image: 'https://images.ctfassets.net/r65x6q43xsmv/1m6ZbYC8yR5N7oqyjl6mn9/1ea5744942ec56615169d04c3d8ac0db/THUMBNAIL.png' },
+  { title: 'Blended Fingers', image: 'https://images.ctfassets.net/r65x6q43xsmv/3pe9PR2LlRr1dU5YjP0rFo/65bb0549b372e2b93409a78692bd844c/EDG_BlendedFingers_4.00_00_31_20.Still001.png' },
+  { title: 'Bic Runga', image: 'https://images.ctfassets.net/r65x6q43xsmv/3pmodfUfwOFzrC1fFu7pqV/7349e87e889d99b325a6d41d50da8dc3/bic-runga-social-IMAGE.jpg' },
+];
+
+const headlines = [
+  { title: 'Splore 2026: Everything you need to know', image: 'https://images.ctfassets.net/r65x6q43xsmv/4kLX9pTYL3seM6pO0WdgRM/7b64353af22fc7a439ea44362b6abd1d/Moonlight-over-Tapapakanga-Splore-2024---Nicole-Brannen-82.jpg' },
+  { title: 'Bic Runga back with disco-inspired album', image: 'https://images.ctfassets.net/r65x6q43xsmv/6PIqgMKAazth3yyFWsARx8/a9a1cd257a6c75525fdd4169072bbe2b/bic-runga-rova.jpg' },
+  { title: 'Six60 announce Sky Tower show', image: 'https://images.ctfassets.net/r65x6q43xsmv/3MRNaSK6FjGY5VJadlZGhu/9c8d87389a7147eb9cb3095c3a226760/Six60SkyTower-HERO.jpg' },
 ];
 
 export default function HomePage() {
   const router = useRouter();
   const prefs = usePreferences();
   const { buildJourney, startJourney } = useJourney();
-  const [toastShown, setToastShown] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const cityName =
     prefs.city === 'auckland'
@@ -66,7 +75,7 @@ export default function HomePage() {
       segments.push({
         id: String(id++),
         type: 'traffic',
-        title: `${cityName} Traffic`,
+        title: 'Traffic for your journey to work',
         duration: 90,
         script: scripts.traffic[cityKey] || scripts.traffic.auckland,
         status: 'upcoming',
@@ -78,6 +87,7 @@ export default function HomePage() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
+        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people' },
       });
     }
 
@@ -85,7 +95,7 @@ export default function HomePage() {
       segments.push({
         id: String(id++),
         type: 'weather',
-        title: `${cityName} Weather`,
+        title: 'Weather for your journey to work',
         duration: 60,
         script: scripts.weather[cityKey] || scripts.weather.auckland,
         status: 'upcoming',
@@ -97,6 +107,7 @@ export default function HomePage() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
+        metadata: { advertiser: 'Z Energy', color: '#FF6900', tagline: 'Feel the good energy' },
       });
     }
 
@@ -105,7 +116,7 @@ export default function HomePage() {
       segments.push({
         id: String(id++),
         type: 'news',
-        title: 'News Update',
+        title: 'Your News — Black Caps lineup announced',
         duration: prefs.news.length === 'brief' ? 30 : prefs.news.length === 'detailed' ? 90 : 60,
         script: scripts.news[newsLength] || scripts.news.standard,
         status: 'upcoming',
@@ -117,6 +128,27 @@ export default function HomePage() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
+        metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition' },
+      });
+    }
+
+    if (prefs.sport?.enabled) {
+      segments.push({
+        id: String(id++),
+        type: 'sport' as SegmentType,
+        title: 'Sport — Silver Ferns claim Constellation Cup',
+        duration: prefs.sport.length === 'brief' ? 30 : prefs.sport.length === 'detailed' ? 90 : 60,
+        script: "Sport now — Cricket New Zealand has named the Black Caps squad for the upcoming test series in England. Kane Williamson returns to captain the side. And the Silver Ferns have claimed the Constellation Cup with a dramatic 58-56 win over Australia in Melbourne.",
+        status: 'upcoming',
+      });
+      segments.push({
+        id: String(id++),
+        type: 'ad',
+        title: 'Ad Break',
+        duration: 15,
+        script: adScripts[adIdx++ % adScripts.length],
+        status: 'upcoming',
+        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people' },
       });
     }
 
@@ -137,26 +169,25 @@ export default function HomePage() {
     router.push('/journey');
   };
 
-  // Show "car connected" toast on load
+  // Show "car connected" modal after 5 seconds
   useEffect(() => {
-    if (toastShown) return;
-    setToastShown(true);
     const timer = setTimeout(() => {
-      toast('Car connected — start journey?', {
-        duration: 8000,
-        action: {
-          label: 'Start',
-          onClick: () => handleStartJourney(),
-        },
-      });
-    }, 1000);
+      setShowModal(true);
+    }, 5000);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Category tabs
   const tabs = ['For you', 'Radio', 'Podcasts', 'Videos', 'Articles'];
   const [activeTab, setActiveTab] = useState('For you');
+
+  const segmentBadges = [
+    prefs.traffic.enabled && 'Traffic',
+    prefs.weather.enabled && 'Weather',
+    prefs.news.enabled && 'News',
+    prefs.sport?.enabled && 'Sport',
+    'Entertainment',
+  ].filter(Boolean);
 
   return (
     <AppShell>
@@ -187,8 +218,13 @@ export default function HomePage() {
                 key={i}
                 className="shrink-0 w-[280px] border-0 bg-secondary/50 overflow-hidden cursor-pointer hover:bg-secondary transition-colors"
               >
-                <div className="h-40 bg-gradient-to-br from-primary/20 to-secondary flex items-center justify-center text-6xl">
-                  {item.image}
+                <div className="h-40 relative">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-3">
                   <p className="text-xs text-muted-foreground">{item.type}</p>
@@ -246,13 +282,44 @@ export default function HomePage() {
               <div
                 key={i}
                 className="shrink-0 w-[140px] h-[200px] rounded-2xl overflow-hidden relative cursor-pointer"
-                style={{ backgroundColor: item.color }}
               >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <p className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white leading-tight">
                   {item.title}
                 </p>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Headlines section */}
+        <div>
+          <h2 className="text-xl font-bold mb-3">Headlines</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar">
+            {headlines.map((item, i) => (
+              <Card
+                key={i}
+                className="shrink-0 w-[280px] border-0 bg-secondary/50 overflow-hidden cursor-pointer hover:bg-secondary transition-colors"
+              >
+                <div className="h-40 relative">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-3">
+                  <p className="text-xs text-muted-foreground">Headline</p>
+                  <p className="text-sm font-semibold mt-1 line-clamp-2">{item.title}</p>
+                </div>
+              </Card>
             ))}
           </div>
         </div>
@@ -280,6 +347,62 @@ export default function HomePage() {
           </Card>
         )}
       </div>
+
+      {/* Full-screen Car Connected Modal */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="w-full max-w-sm mx-4 rounded-2xl bg-card border border-border p-6 text-center animate-in zoom-in-95 fade-in duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Car icon */}
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Car className="h-8 w-8 text-primary" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-bold mb-1">Car Connected</h2>
+            <p className="text-sm text-muted-foreground mb-5">Your personalised journey is ready</p>
+
+            {/* Route display */}
+            <div className="flex items-center justify-center gap-2 mb-5 text-sm text-muted-foreground">
+              <span>{prefs.homeAddress}</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+              <span>{prefs.workAddress}</span>
+            </div>
+
+            {/* Segment badges */}
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
+              {segmentBadges.map((label) => (
+                <Badge key={label as string} variant="outline" className="text-xs bg-background/50">
+                  {label}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Start Journey button */}
+            <Button
+              onClick={handleStartJourney}
+              className="w-full text-base font-semibold bg-primary hover:bg-primary/90"
+              size="lg"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Start Journey
+            </Button>
+
+            {/* Not now link */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

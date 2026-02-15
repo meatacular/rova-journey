@@ -1,6 +1,6 @@
 'use client';
 
-import { Car, Cloud, Newspaper, Radio, Megaphone, Check } from 'lucide-react';
+import { Car, Cloud, Newspaper, Radio, Megaphone, Check, Trophy } from 'lucide-react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +8,7 @@ const segmentIcons: Record<string, React.ElementType> = {
   traffic: Car,
   weather: Cloud,
   news: Newspaper,
+  sport: Trophy,
   entertainment: Radio,
   ad: Megaphone,
 };

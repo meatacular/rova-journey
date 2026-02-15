@@ -81,9 +81,10 @@ export function JourneyPlayer() {
           duration={currentSegment.duration}
           onComplete={handleAdComplete}
           isPaused={!isPlaying}
+          metadata={currentSegment.metadata}
         />
       ) : (
-        <SegmentDisplay segment={currentSegment} />
+        <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} />
       )}
 
       {currentSegment.type !== 'ad' && (
