@@ -71,7 +71,7 @@ export function JourneyPlayer() {
   return (
     <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Now Playing</h1>
+        <h1 className="text-xl sm:text-lg font-semibold">Now Playing</h1>
         <Button variant="ghost" size="icon" onClick={handleClose}>
           <X className="h-5 w-5" />
         </Button>
@@ -102,7 +102,7 @@ export function JourneyPlayer() {
       {currentSegment.type !== 'ad' && (
         <div className="space-y-1">
           <Progress value={progress} className="h-1.5" />
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-sm sm:text-xs text-muted-foreground">
             <span>
               {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
             </span>
@@ -119,15 +119,15 @@ export function JourneyPlayer() {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={skipSegment}
-          className="absolute -top-3 -left-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/80 text-primary-foreground shadow-md transition-transform active:scale-95"
+          className="absolute -top-4 -left-4 sm:-top-3 sm:-left-3 flex h-12 w-12 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary/80 text-primary-foreground shadow-md transition-transform active:scale-95"
         >
-          <SkipForward className="h-3.5 w-3.5" />
+          <SkipForward className="h-5 w-5 sm:h-3.5 sm:w-3.5" />
         </button>
         <button
           onClick={handlePlayPause}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
+          className="flex h-[4.5rem] w-[4.5rem] sm:h-14 sm:w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
         >
-          {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
+          {isPlaying ? <Pause className="h-8 w-8 sm:h-6 sm:w-6" /> : <Play className="h-8 w-8 sm:h-6 sm:w-6 ml-0.5" />}
         </button>
       </div>
     </div>

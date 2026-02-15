@@ -39,7 +39,7 @@ export function AdBreak({ script, duration, onComplete, isPaused, metadata }: Ad
       className="rounded-2xl p-6 flex items-center justify-center"
       style={{ backgroundColor: adColor }}
     >
-      <span className="text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
+      <span className="text-3xl sm:text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
     </div>
   );
 
@@ -52,10 +52,10 @@ export function AdBreak({ script, duration, onComplete, isPaused, metadata }: Ad
       ) : (
         brandBlock
       )}
-      <p className="text-center text-sm text-muted-foreground">{tagline}</p>
+      <p className="text-center text-base sm:text-sm text-muted-foreground">{tagline}</p>
       <div className="w-full max-w-xs space-y-2">
         <Progress value={progress} className="h-1.5" />
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-sm sm:text-xs text-muted-foreground">
           Ad · {remaining}s remaining
         </p>
       </div>

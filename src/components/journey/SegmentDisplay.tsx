@@ -62,23 +62,23 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
   return (
     <div className="flex flex-col items-center gap-3 py-2">
       <div className="flex items-center gap-3">
-        <div className={cn('rounded-lg bg-secondary p-2', color)}>
-          <Icon className="h-5 w-5" />
+        <div className={cn('rounded-lg bg-secondary p-2.5 sm:p-2', color)}>
+          <Icon className="h-6 w-6 sm:h-5 sm:w-5" />
         </div>
         <div>
-          <h2 className="text-base font-semibold leading-tight">{segment.title}</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-lg sm:text-base font-semibold leading-tight">{segment.title}</h2>
+          <p className="text-sm sm:text-xs text-muted-foreground">
             {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
           </p>
         </div>
       </div>
-      {/* Live captions — moved up to second position */}
+      {/* Live captions — 3 lines visible */}
       {segment.script && words.length > 0 && (
         <div
           ref={scrollRef}
-          className="max-h-14 w-full overflow-y-auto rounded-xl bg-secondary/50 px-4 py-2"
+          className="max-h-[4.5rem] w-full overflow-y-auto rounded-xl bg-secondary/50 px-4 py-2"
         >
-          <p className="text-sm leading-relaxed">
+          <p className="text-base sm:text-sm leading-relaxed">
             {words.map((word, i) => (
               <span
                 key={i}

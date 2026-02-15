@@ -31,22 +31,22 @@ export function QueueItem({ segment, isActive }: QueueItemProps) {
     >
       <div
         className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-lg',
+          'flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg',
           isActive ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
         )}
       >
         {segment.status === 'done' ? (
-          <Check className="h-4 w-4" />
+          <Check className="h-5 w-5 sm:h-4 sm:w-4" />
         ) : (
-          <Icon className="h-4 w-4" />
+          <Icon className="h-5 w-5 sm:h-4 sm:w-4" />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-medium truncate', isActive && 'text-primary')}>
+        <p className={cn('text-base sm:text-sm font-medium truncate', isActive && 'text-primary')}>
           {segment.title}
         </p>
       </div>
-      <span className="text-xs text-muted-foreground">
+      <span className="text-sm sm:text-xs text-muted-foreground">
         {segment.duration < 60
           ? `${segment.duration}s`
           : `${Math.floor(segment.duration / 60)}:${String(segment.duration % 60).padStart(2, '0')}`}
