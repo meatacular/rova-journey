@@ -1,13 +1,31 @@
 'use client';
 
-import { UserCircle, Play } from 'lucide-react';
+import { UserCircle, Play, Pause } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useStartJourney } from '@/lib/hooks/useStartJourney';
+import { useJourney } from '@/lib/stores/journey';
 
 export function Header() {
   const { handleStartJourney } = useStartJourney();
+  const { isActive, isPlaying, pauseJourney, resumeJourney } = useJourney();
+
+  const handleClick = () => {
+    if (isActive && isPlaying) {
+      pauseJourney();
+    } else if (isActive && !isPlaying) {
+      resumeJourney();
+    } else {
+      handleStartJourney();
+    }
+  };
+
+  const buttonLabel = isActive
+    ? isPlaying ? 'Pause Journey' : 'Resume'
+    : 'Start Journey';
+
+  const ButtonIcon = isActive && isPlaying ? Pause : Play;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
@@ -18,12 +36,12 @@ export function Header() {
         </Link>
         <div className="flex items-center gap-2">
           <Button
-            onClick={handleStartJourney}
+            onClick={handleClick}
             size="sm"
             className="h-8 rounded-full text-xs font-semibold"
           >
-            <Play className="mr-1 h-3 w-3" />
-            Start Journey
+            <ButtonIcon className="mr-1 h-3 w-3" />
+            {buttonLabel}
           </Button>
           <Link
             href="/preferences"

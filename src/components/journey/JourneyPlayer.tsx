@@ -67,8 +67,12 @@ export function JourneyPlayer() {
     ? (elapsedTime / currentSegment.duration) * 100
     : 0;
 
+  const handlePlayPause = isPlaying
+    ? pauseJourney
+    : (segments[currentSegmentIndex]?.status === 'playing' ? resumeJourney : startJourney);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Now Playing</h1>
         <Button variant="ghost" size="icon" onClick={handleClose}>
@@ -97,10 +101,21 @@ export function JourneyPlayer() {
         </>
       )}
 
+      {/* Progress bar with skip — tight under captions */}
       {currentSegment.type !== 'ad' && (
-        <div className="space-y-2">
-          <Progress value={progress} className="h-1.5" />
-          <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Progress value={progress} className="h-1.5 flex-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0 rounded-full"
+              onClick={skipSegment}
+            >
+              <SkipForward className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground pr-10">
             <span>
               {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
             </span>
@@ -111,26 +126,15 @@ export function JourneyPlayer() {
         </div>
       )}
 
-      <div className="flex items-center justify-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full"
-          onClick={isPlaying ? pauseJourney : (segments[currentSegmentIndex]?.status === 'playing' ? resumeJourney : startJourney)}
-        >
-          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 rounded-full"
-          onClick={skipSegment}
-        >
-          <SkipForward className="h-5 w-5" />
-        </Button>
-      </div>
-
       <QueueList segments={segments} currentIndex={currentSegmentIndex} />
+
+      {/* Floating play/pause button — bottom right */}
+      <button
+        onClick={handlePlayPause}
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
+      >
+        {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
+      </button>
     </div>
   );
 }

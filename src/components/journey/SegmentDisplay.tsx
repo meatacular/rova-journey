@@ -72,20 +72,11 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
           </p>
         </div>
       </div>
-      {/* Visual overlays for each segment type */}
-      {segment.type === 'traffic' && (
-        <TrafficOverlay elapsedTime={elapsedTime} />
-      )}
-      {segment.type === 'weather' && (
-        <WeatherRadar />
-      )}
-      {(segment.type === 'news' || segment.type === 'sport') && (
-        <StoryImages type={segment.type as 'news' | 'sport'} elapsedTime={elapsedTime} />
-      )}
+      {/* Live captions — moved up to second position */}
       {segment.script && words.length > 0 && (
         <div
           ref={scrollRef}
-          className="mt-2 max-h-14 w-full overflow-y-auto rounded-xl bg-secondary/50 px-4 py-2"
+          className="max-h-14 w-full overflow-y-auto rounded-xl bg-secondary/50 px-4 py-2"
         >
           <p className="text-sm leading-relaxed">
             {words.map((word, i) => (
@@ -106,6 +97,16 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
             ))}
           </p>
         </div>
+      )}
+      {/* Visual overlays for each segment type */}
+      {segment.type === 'traffic' && (
+        <TrafficOverlay elapsedTime={elapsedTime} />
+      )}
+      {segment.type === 'weather' && (
+        <WeatherRadar />
+      )}
+      {(segment.type === 'news' || segment.type === 'sport') && (
+        <StoryImages type={segment.type as 'news' | 'sport'} elapsedTime={elapsedTime} />
       )}
     </div>
   );
