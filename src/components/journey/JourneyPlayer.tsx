@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useState, useRef } from 'react';
-import { Play, Pause, SkipForward } from 'lucide-react';
+import { Play, Pause, SkipForward, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useJourney } from '@/lib/stores/journey';
 import { SegmentDisplay } from './SegmentDisplay';
@@ -86,12 +86,22 @@ export function JourneyPlayer() {
 
   return (
     <div className="space-y-2 pb-20">
-      {/* Segment tab bar */}
-      <SegmentTabBar
-        segments={segments}
-        currentIndex={currentSegmentIndex}
-        onJump={jumpToSegment}
-      />
+      {/* Segment tab bar + close button */}
+      <div className="flex items-center -mt-3">
+        <div className="flex-1">
+          <SegmentTabBar
+            segments={segments}
+            currentIndex={currentSegmentIndex}
+            onJump={jumpToSegment}
+          />
+        </div>
+        <button
+          onClick={handleClose}
+          className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground shrink-0"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
 
       {currentSegment.type === 'ad' ? (
         <AdBreak
@@ -103,7 +113,7 @@ export function JourneyPlayer() {
         />
       ) : (
         <>
-          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} onClose={handleClose} progress={progress} />
+          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} progress={progress} />
           {currentSegment.type === 'entertainment' && currentSegment.metadata?.streamUrl && (
             <RadioPlayer
               streamUrl={currentSegment.metadata.streamUrl as string}

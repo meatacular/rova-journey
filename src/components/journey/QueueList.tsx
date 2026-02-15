@@ -9,27 +9,29 @@ interface QueueListProps {
   onJump?: (index: number) => void;
 }
 
-export function QueueList({ segments, currentIndex, onJump }: QueueListProps) {
-  // Filter out ad segments for the queue display
-  const visibleSegments = segments
-    .map((s, i) => ({ segment: s, originalIndex: i }))
-    .filter(({ segment }) => segment.type !== 'ad');
+/** Strip category prefixes like "Sport — " or "Your News — " from titles */
+function stripPrefix(title: string): string {
+  const idx = title.indexOf(' — ');
+  return idx !== -1 ? title.slice(idx + 3) : title;
+}
 
-  // Reorder: currently playing first, then upcoming, then done
-  const playing = visibleSegments.filter(({ segment }) => segment.status === 'playing');
-  const upcoming = visibleSegments.filter(({ segment }) => segment.status === 'upcoming');
-  const done = visibleSegments.filter(({ segment }) => segment.status === 'done');
-  const ordered = [...playing, ...upcoming, ...done];
+export function QueueList({ segments, currentIndex, onJump }: QueueListProps) {
+  // Only show upcoming non-ad segments (hide playing + done)
+  const upcoming = segments
+    .map((s, i) => ({ segment: s, originalIndex: i }))
+    .filter(({ segment }) => segment.type !== 'ad' && segment.status === 'upcoming');
+
+  if (upcoming.length === 0) return null;
 
   return (
     <div className="space-y-1">
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        Your Journey
+        Up Next
       </h3>
-      {ordered.map(({ segment, originalIndex }) => (
+      {upcoming.map(({ segment, originalIndex }) => (
         <QueueItem
           key={segment.id}
-          segment={segment}
+          segment={{ ...segment, title: stripPrefix(segment.title) }}
           isActive={originalIndex === currentIndex}
           onClick={onJump ? () => onJump(originalIndex) : undefined}
         />

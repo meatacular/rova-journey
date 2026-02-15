@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { X } from 'lucide-react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
@@ -13,11 +12,10 @@ import { StoryImages } from './StoryImages';
 interface SegmentDisplayProps {
   segment: JourneySegment;
   elapsedTime: number;
-  onClose?: () => void;
   progress?: number;
 }
 
-export function SegmentDisplay({ segment, elapsedTime, onClose, progress }: SegmentDisplayProps) {
+export function SegmentDisplay({ segment, elapsedTime, progress }: SegmentDisplayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeWordRef = useRef<HTMLSpanElement>(null);
 
@@ -44,21 +42,11 @@ export function SegmentDisplay({ segment, elapsedTime, onClose, progress }: Segm
 
   return (
     <div className="flex flex-col gap-3 py-2">
-      <div className="flex items-center gap-3 w-full">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-base font-semibold leading-tight truncate">{segment.title}</h2>
-          <p className="text-sm sm:text-xs text-muted-foreground">
-            {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
-          </p>
-        </div>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground shrink-0"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
+      <div className="w-full">
+        <h2 className="text-lg sm:text-base font-semibold leading-tight truncate">{segment.title}</h2>
+        <p className="text-sm sm:text-xs text-muted-foreground">
+          {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
+        </p>
       </div>
 
       {/* Progress bar under header */}
