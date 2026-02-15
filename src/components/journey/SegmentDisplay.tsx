@@ -5,7 +5,7 @@ import { Car, Cloud, Newspaper, Radio, Megaphone, Trophy } from 'lucide-react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { TrafficOverlay } from './TrafficOverlay';
-import { WeatherRadar } from './WeatherRadar';
+import { WeatherCarousel } from './WeatherCarousel';
 import { StoryImages } from './StoryImages';
 
 const segmentIcons: Record<string, React.ElementType> = {
@@ -103,7 +103,7 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
         <TrafficOverlay elapsedTime={elapsedTime} />
       )}
       {segment.type === 'weather' && (
-        <WeatherRadar />
+        <WeatherCarousel />
       )}
       {(segment.type === 'news' || segment.type === 'sport') && (
         <StoryImages type={segment.type as 'news' | 'sport'} elapsedTime={elapsedTime} />
