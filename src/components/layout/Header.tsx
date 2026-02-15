@@ -1,6 +1,6 @@
 'use client';
 
-import { Settings, Play } from 'lucide-react';
+import { UserCircle, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,7 @@ export function Header() {
             href="/preferences"
             className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            <Settings className="h-5 w-5" />
+            <UserCircle className="h-5 w-5" />
           </Link>
         </div>
       </div>
