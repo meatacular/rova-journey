@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useJourney } from '@/lib/stores/journey';
 import { SegmentDisplay } from './SegmentDisplay';
+import { RadioPlayer } from './RadioPlayer';
 import { AdBreak } from './AdBreak';
 import { QueueList } from './QueueList';
 import { useRouter } from 'next/navigation';
@@ -84,7 +85,16 @@ export function JourneyPlayer() {
           metadata={currentSegment.metadata}
         />
       ) : (
-        <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} />
+        <>
+          <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} />
+          {currentSegment.type === 'entertainment' && currentSegment.metadata?.streamUrl && (
+            <RadioPlayer
+              streamUrl={currentSegment.metadata.streamUrl as string}
+              stationColor={(currentSegment.metadata.stationColor as string) || '#6C3AED'}
+              isPlaying={isPlaying}
+            />
+          )}
+        </>
       )}
 
       {currentSegment.type !== 'ad' && (

@@ -6,6 +6,7 @@ export interface Station {
   tagline: string;
   city?: string;
   logo: string;
+  streamUrl: string;
 }
 
 export interface Podcast {

@@ -37,7 +37,7 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
   const words = segment.script ? segment.script.split(/\s+/) : [];
   const totalWords = words.length;
   // Calculate which word should be highlighted based on elapsed time
-  const wordsPerSecond = totalWords / segment.duration;
+  const wordsPerSecond = (totalWords / segment.duration) * 2.5;
   const currentWordIndex = Math.min(Math.floor(elapsedTime * wordsPerSecond), totalWords - 1);
 
   // Auto-scroll to keep current word visible
@@ -69,7 +69,7 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
       {segment.script && words.length > 0 && (
         <div
           ref={scrollRef}
-          className="mt-2 max-h-48 w-full overflow-y-auto rounded-xl bg-secondary/50 p-4"
+          className="mt-2 max-h-14 w-full overflow-y-auto rounded-xl bg-secondary/50 px-4 py-2"
         >
           <p className="text-sm leading-relaxed">
             {words.map((word, i) => (
