@@ -4,6 +4,9 @@ import { useRef, useEffect } from 'react';
 import { Car, Cloud, Newspaper, Radio, Megaphone, Trophy } from 'lucide-react';
 import { JourneySegment } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { TrafficOverlay } from './TrafficOverlay';
+import { WeatherRadar } from './WeatherRadar';
+import { StoryImages } from './StoryImages';
 
 const segmentIcons: Record<string, React.ElementType> = {
   traffic: Car,
@@ -66,6 +69,16 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
           {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
         </p>
       </div>
+      {/* Visual overlays for each segment type */}
+      {segment.type === 'traffic' && (
+        <TrafficOverlay elapsedTime={elapsedTime} />
+      )}
+      {segment.type === 'weather' && (
+        <WeatherRadar />
+      )}
+      {(segment.type === 'news' || segment.type === 'sport') && (
+        <StoryImages type={segment.type as 'news' | 'sport'} elapsedTime={elapsedTime} />
+      )}
       {segment.script && words.length > 0 && (
         <div
           ref={scrollRef}
