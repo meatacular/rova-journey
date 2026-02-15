@@ -27,17 +27,16 @@ export function SegmentDisplay({ segment, elapsedTime, onClose, progress }: Segm
   const wordsPerSecond = totalWords > 0 ? totalWords / segment.duration : 0;
   const currentWordIndex = Math.min(Math.floor(elapsedTime * wordsPerSecond), totalWords - 1);
 
-  // Auto-scroll transcript container only (not the page)
+  // Auto-scroll horizontally to keep the active word visible
   useEffect(() => {
     if (activeWordRef.current && scrollRef.current) {
       const container = scrollRef.current;
       const word = activeWordRef.current;
-      const wordTop = word.offsetTop;
-      const containerHeight = container.clientHeight;
+      const wordLeft = word.offsetLeft;
+      const containerWidth = container.clientWidth;
 
-      // Scroll within the container to keep the word centered
       container.scrollTo({
-        top: wordTop - containerHeight / 2,
+        left: wordLeft - containerWidth * 0.3,
         behavior: 'smooth',
       });
     }
@@ -76,13 +75,13 @@ export function SegmentDisplay({ segment, elapsedTime, onClose, progress }: Segm
           </div>
         </div>
       )}
-      {/* Live captions — 3 lines visible */}
+      {/* Live captions — single line, horizontal scroll */}
       {segment.script && words.length > 0 && (
         <div
           ref={scrollRef}
-          className="max-h-[4.5rem] w-full overflow-y-auto rounded-xl bg-secondary/50 px-4 py-2"
+          className="w-full overflow-x-auto overflow-y-hidden rounded-xl bg-secondary/50 px-4 py-2 no-scrollbar"
         >
-          <p className="text-base sm:text-sm leading-relaxed">
+          <p className="whitespace-nowrap text-base sm:text-sm">
             {words.map((word, i) => (
               <span
                 key={i}
