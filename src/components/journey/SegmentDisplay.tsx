@@ -59,15 +59,17 @@ export function SegmentDisplay({ segment, elapsedTime }: SegmentDisplayProps) {
   }, [currentWordIndex]);
 
   return (
-    <div className="flex flex-col items-center gap-4 py-6">
-      <div className={cn('rounded-2xl bg-secondary p-6', color)}>
-        <Icon className="h-12 w-12" />
-      </div>
-      <div className="text-center">
-        <h2 className="text-lg font-semibold">{segment.title}</h2>
-        <p className="text-sm text-muted-foreground">
-          {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
-        </p>
+    <div className="flex flex-col items-center gap-3 py-2">
+      <div className="flex items-center gap-3">
+        <div className={cn('rounded-lg bg-secondary p-2', color)}>
+          <Icon className="h-5 w-5" />
+        </div>
+        <div>
+          <h2 className="text-base font-semibold leading-tight">{segment.title}</h2>
+          <p className="text-xs text-muted-foreground">
+            {Math.floor(segment.duration / 60)}:{String(segment.duration % 60).padStart(2, '0')}
+          </p>
+        </div>
       </div>
       {/* Visual overlays for each segment type */}
       {segment.type === 'traffic' && (
