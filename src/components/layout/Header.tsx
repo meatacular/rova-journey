@@ -21,9 +21,7 @@ export function Header() {
     }
   };
 
-  const buttonLabel = isActive
-    ? isPlaying ? 'Pause Journey' : 'Resume'
-    : 'Start Journey';
+  const buttonLabel = 'Your Journey';
 
   const ButtonIcon = isActive && isPlaying ? Pause : Play;
 
