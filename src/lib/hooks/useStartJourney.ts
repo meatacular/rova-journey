@@ -49,7 +49,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
+        metadata: { advertiser: 'Woolworths', color: '#007837', tagline: 'Everyone deserves quality', logo: '/ads/woolworths.svg', url: 'https://www.woolworths.co.nz' },
       });
     }
 
@@ -69,7 +69,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'Z Energy', color: '#FF6900', tagline: 'Feel the good energy', url: 'https://www.z.co.nz' },
+        metadata: { advertiser: 'Z Energy', color: '#002B5C', tagline: 'Feel the good energy', logo: '/ads/z-energy.svg', url: 'https://www.z.co.nz' },
       });
     }
 
@@ -90,7 +90,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition', url: 'https://www.asb.co.nz' },
+        metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition', logo: '/ads/asb.svg', url: 'https://www.asb.co.nz' },
       });
     }
 
@@ -110,7 +110,7 @@ export function useStartJourney() {
         duration: 15,
         script: adScripts[adIdx++ % adScripts.length],
         status: 'upcoming',
-        metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
+        metadata: { advertiser: 'Woolworths', color: '#007837', tagline: 'Everyone deserves quality', logo: '/ads/woolworths.svg', url: 'https://www.woolworths.co.nz' },
       });
     }
 
@@ -191,7 +191,7 @@ export function useStartJourney() {
       duration: 15,
       script: adScripts[adIdx++ % adScripts.length],
       status: 'upcoming',
-      metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
+      metadata: { advertiser: 'Woolworths', color: '#007837', tagline: 'Everyone deserves quality', logo: '/ads/woolworths.svg', url: 'https://www.woolworths.co.nz' },
     });
 
     // Weather
@@ -210,7 +210,7 @@ export function useStartJourney() {
       duration: 15,
       script: adScripts[adIdx++ % adScripts.length],
       status: 'upcoming',
-      metadata: { advertiser: 'Z Energy', color: '#FF6900', tagline: 'Feel the good energy', url: 'https://www.z.co.nz' },
+      metadata: { advertiser: 'Z Energy', color: '#002B5C', tagline: 'Feel the good energy', logo: '/ads/z-energy.svg', url: 'https://www.z.co.nz' },
     });
 
     // News
@@ -229,7 +229,7 @@ export function useStartJourney() {
       duration: 15,
       script: adScripts[adIdx++ % adScripts.length],
       status: 'upcoming',
-      metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition', url: 'https://www.asb.co.nz' },
+      metadata: { advertiser: 'ASB', color: '#FFCC00', tagline: 'Here for your ambition', logo: '/ads/asb.svg', url: 'https://www.asb.co.nz' },
     });
 
     // Sport
@@ -248,7 +248,7 @@ export function useStartJourney() {
       duration: 15,
       script: adScripts[adIdx++ % adScripts.length],
       status: 'upcoming',
-      metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
+      metadata: { advertiser: 'Woolworths', color: '#007837', tagline: 'Everyone deserves quality', logo: '/ads/woolworths.svg', url: 'https://www.woolworths.co.nz' },
     });
 
     // Entertainment — use a featured podcast for first-time generic journeys

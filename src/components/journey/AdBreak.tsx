@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
 import { useJourney } from '@/lib/stores/journey';
 
@@ -33,13 +34,24 @@ export function AdBreak({ script, duration, onComplete, isPaused, metadata }: Ad
   const adColor = (metadata?.color as string) || '#666';
   const tagline = (metadata?.tagline as string) || script;
   const adUrl = metadata?.url as string | undefined;
+  const logo = metadata?.logo as string | undefined;
 
   const brandBlock = (
     <div
       className="rounded-2xl p-6 flex items-center justify-center"
       style={{ backgroundColor: adColor }}
     >
-      <span className="text-3xl sm:text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
+      {logo ? (
+        <Image
+          src={logo}
+          alt={advertiser || 'Ad'}
+          width={200}
+          height={100}
+          className="h-16 w-auto"
+        />
+      ) : (
+        <span className="text-3xl sm:text-2xl font-bold text-white">{advertiser || 'Ad'}</span>
+      )}
     </div>
   );
 

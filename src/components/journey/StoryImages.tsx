@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
 interface StoryImage {
@@ -31,22 +32,34 @@ interface StoryImagesProps {
 export function StoryImages({ type, elapsedTime }: StoryImagesProps) {
   const images = type === 'sport' ? sportImages : newsImages;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [manualOverride, setManualOverride] = useState(false);
 
-  // Cycle through images every 4 seconds
+  // Auto-cycle every 4 seconds unless user has manually navigated
   useEffect(() => {
+    if (manualOverride) return;
     const idx = Math.floor(elapsedTime / 4) % images.length;
     setCurrentIndex(idx);
-  }, [elapsedTime, images.length]);
+  }, [elapsedTime, images.length, manualOverride]);
+
+  const goTo = useCallback((idx: number) => {
+    setManualOverride(true);
+    setCurrentIndex(idx);
+  }, []);
+
+  const prev = useCallback(() => {
+    setManualOverride(true);
+    setCurrentIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+  }, [images.length]);
+
+  const next = useCallback(() => {
+    setManualOverride(true);
+    setCurrentIndex((i) => (i + 1) % images.length);
+  }, [images.length]);
 
   const current = images[currentIndex];
 
   return (
-    <a
-      href={current.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block w-full rounded-xl overflow-hidden bg-secondary/50"
-    >
+    <div className="block w-full rounded-xl overflow-hidden bg-secondary/50">
       <div className="relative w-full aspect-video">
         <Image
           src={current.url}
@@ -56,14 +69,30 @@ export function StoryImages({ type, elapsedTime }: StoryImagesProps) {
           sizes="(max-width: 512px) 100vw, 512px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+        {/* Left/right skip arrows */}
+        <button
+          onClick={prev}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button
+          onClick={next}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+
         <div className="absolute bottom-0 left-0 right-0 p-3">
           <p className="text-xs font-semibold text-white leading-tight">{current.caption}</p>
         </div>
-        {/* Progress dots */}
+        {/* Progress dots — tappable */}
         <div className="absolute top-2 right-2 flex gap-1">
           {images.map((_, i) => (
-            <div
+            <button
               key={i}
+              onClick={() => goTo(i)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === currentIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/40'
               }`}
@@ -71,6 +100,6 @@ export function StoryImages({ type, elapsedTime }: StoryImagesProps) {
           ))}
         </div>
       </div>
-    </a>
+    </div>
   );
 }

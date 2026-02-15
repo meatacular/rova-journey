@@ -16,7 +16,7 @@ export const scripts = {
     detailed: `Here's your comprehensive news wrap. The government has today announced a major two-and-a-half billion dollar transport package for Auckland, featuring new rapid transit corridors and significant motorway upgrades. Officials say commute times could be reduced by up to 20 percent across the city. The opposition has called for more detail on funding sources. In education, te reo Māori immersion schools are reporting record enrolments, with a 15 percent increase for 2026 and growing waitlists in urban areas. Sport now — Cricket New Zealand has named the Black Caps squad for the upcoming test series in England. Kane Williamson returns to captain the side, and there's an exciting debut call-up for Canterbury quick Zak Thompson. Staying with sport, the Silver Ferns have claimed the Constellation Cup with a dramatic 58-56 win over Australia in Melbourne. Business — Fonterra has posted a record half-year profit, with earnings up 22 percent driven by surging Asian demand. And Auckland AI startup RouteSmart has raised 50 million dollars in Series B funding to expand across the Tasman. In entertainment, Six60 have announced a massive stadium tour across Aotearoa for next summer, and Lorde has teased a surprise new album dropping in March.`,
   },
   ad: [
-    'Brought to you by Countdown — the fresh food people.',
+    'Brought to you by Woolworths — everyone deserves quality.',
     'This journey is powered by Z Energy — feel the good energy.',
     'Thanks to ASB Bank — here for your ambition.',
   ],
