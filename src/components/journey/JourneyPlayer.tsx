@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useJourney } from '@/lib/stores/journey';
 import { SegmentDisplay } from './SegmentDisplay';
 import { RadioPlayer } from './RadioPlayer';
+import { PodcastPlayer } from './PodcastPlayer';
 import { AdBreak } from './AdBreak';
 import { QueueList } from './QueueList';
 import { SegmentTabBar } from './SegmentTabBar';
@@ -114,11 +115,19 @@ export function JourneyPlayer() {
       ) : (
         <>
           <SegmentDisplay segment={currentSegment} elapsedTime={elapsedTime} progress={progress} />
-          {currentSegment.type === 'entertainment' && currentSegment.metadata?.streamUrl && (
+          {currentSegment.type === 'entertainment' && currentSegment.metadata?.entertainmentType === 'station' && currentSegment.metadata?.streamUrl && (
             <RadioPlayer
               streamUrl={currentSegment.metadata.streamUrl as string}
               stationColor={(currentSegment.metadata.stationColor as string) || '#6C3AED'}
               isPlaying={isPlaying}
+            />
+          )}
+          {currentSegment.type === 'entertainment' && currentSegment.metadata?.entertainmentType === 'podcast' && currentSegment.metadata?.podcastArtwork && (
+            <PodcastPlayer
+              podcastName={currentSegment.metadata.podcastName as string}
+              host={currentSegment.metadata.podcastHost as string}
+              episodeTitle={currentSegment.metadata.episodeTitle as string}
+              artwork={currentSegment.metadata.podcastArtwork as string}
             />
           )}
         </>

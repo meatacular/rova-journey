@@ -115,20 +115,27 @@ export function useStartJourney() {
     }
 
     if (useEntertainment) {
+      const isStation = prefs.entertainment.type === 'station';
       segments.push({
         id: String(id++),
         type: 'entertainment',
-        title: entertainmentName,
+        title: isStation
+          ? (station?.name || 'The Edge')
+          : (podcast?.latestEpisode?.title || podcast?.name || 'Podcast'),
         duration: 300,
-        script:
-          prefs.entertainment.type === 'station'
-            ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
-            : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
+        script: isStation
+          ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
+          : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
         status: 'upcoming',
-        metadata: {
-          streamUrl: station?.streamUrl,
-          stationColor: station?.color,
-        },
+        metadata: isStation
+          ? { streamUrl: station?.streamUrl, stationColor: station?.color, entertainmentType: 'station' }
+          : {
+              entertainmentType: 'podcast',
+              podcastName: podcast?.name,
+              podcastHost: podcast?.host,
+              podcastArtwork: podcast?.artwork,
+              episodeTitle: podcast?.latestEpisode?.title,
+            },
       });
     }
 
@@ -154,6 +161,8 @@ export function useStartJourney() {
     router.push('/journey');
   };
 
+  const featuredPodcastIds = ['wheres-my-money', 'joe-rogan-experience', 'a-little-bit-extra'];
+
   const startGeneric = (destination: string) => {
     const segments: JourneySegment[] = [];
     let id = 0;
@@ -161,6 +170,10 @@ export function useStartJourney() {
     let adIdx = 0;
     const cityKey = prefs.city as keyof typeof scripts.traffic;
     const label = destination || 'your destination';
+
+    // Pick a random featured podcast for first-time users
+    const randomPodcastId = featuredPodcastIds[Math.floor(Math.random() * featuredPodcastIds.length)];
+    const genericPodcast = podcasts.find((p) => p.id === randomPodcastId) || podcasts.find((p) => p.id === 'a-little-bit-extra')!;
 
     // Traffic
     segments.push({
@@ -238,20 +251,20 @@ export function useStartJourney() {
       metadata: { advertiser: 'Countdown', color: '#007837', tagline: 'The fresh food people', url: 'https://www.countdown.co.nz' },
     });
 
-    // Entertainment
+    // Entertainment — use a featured podcast for first-time generic journeys
     segments.push({
       id: String(id++),
       type: 'entertainment',
-      title: entertainmentName,
+      title: genericPodcast.latestEpisode.title,
       duration: 300,
-      script:
-        prefs.entertainment.type === 'station'
-          ? `Now playing ${station?.name || 'The Edge'} — ${station?.tagline || 'Hit Music'}`
-          : `Now playing ${podcast?.name || 'Podcast'} — ${podcast?.latestEpisode?.title || 'Latest Episode'}`,
+      script: `Now playing ${genericPodcast.name} — ${genericPodcast.latestEpisode.title}`,
       status: 'upcoming',
       metadata: {
-        streamUrl: station?.streamUrl,
-        stationColor: station?.color,
+        entertainmentType: 'podcast',
+        podcastName: genericPodcast.name,
+        podcastHost: genericPodcast.host,
+        podcastArtwork: genericPodcast.artwork,
+        episodeTitle: genericPodcast.latestEpisode.title,
       },
     });
 

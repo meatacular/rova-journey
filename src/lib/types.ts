@@ -16,6 +16,7 @@ export interface Podcast {
   description: string;
   category: string;
   episodeCount: number;
+  artwork?: string;
   latestEpisode: {
     title: string;
     duration: number;
