@@ -39,8 +39,8 @@ export function SegmentDisplay({ segment, elapsedTime, progress }: SegmentDispla
 
   const words = segment.script ? segment.script.split(/\s+/) : [];
   const totalWords = words.length;
-  // Pace words across the full segment duration
-  const wordsPerSecond = totalWords > 0 ? totalWords / segment.duration : 0;
+  // Pace words across the full segment duration (2x speed for readability)
+  const wordsPerSecond = totalWords > 0 ? (totalWords / segment.duration) * 2 : 0;
   const currentWordIndex = Math.min(Math.floor(elapsedTime * wordsPerSecond), totalWords - 1);
 
   // Auto-scroll horizontally to keep the active word visible

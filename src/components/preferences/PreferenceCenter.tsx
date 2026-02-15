@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Navigation, Car, Cloud, Newspaper, Trophy, Radio, Mic, Music, Calendar, Settings, Star } from 'lucide-react';
+import { Navigation, Car, Cloud, Newspaper, Trophy, Radio, Mic, Music, Calendar, Settings, Star, Play, MapPin } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/lib/stores/preferences';
@@ -11,12 +11,16 @@ import { voices } from '@/data/mock/voices';
 import { musicBeds } from '@/data/mock/music-beds';
 import { weatherData } from '@/data/mock/weather';
 import { SettingsDrawer, type SettingsSection } from '@/components/settings/SettingsDrawer';
+import { trafficRoutes } from '@/data/mock/traffic';
+import { useStartJourney } from '@/lib/hooks/useStartJourney';
+import Image from 'next/image';
 
-// --- Feed card wrapper: icon + title + cog in header, content below ---
-function FeedCard({ icon: Icon, title, onSettings, children, color }: {
+// --- Feed card wrapper: icon + title + play + cog in header, content below ---
+function FeedCard({ icon: Icon, title, onSettings, onPlay, children, color }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   onSettings: () => void;
+  onPlay?: () => void;
   children: React.ReactNode;
   color?: string;
 }) {
@@ -25,6 +29,14 @@ function FeedCard({ icon: Icon, title, onSettings, children, color }: {
       <div className="flex items-center gap-2.5 px-4 pt-3 pb-2">
         <Icon className={`h-4 w-4 shrink-0 ${color || 'text-primary'}`} />
         <h2 className="text-sm font-semibold flex-1">{title}</h2>
+        {onPlay && (
+          <button
+            onClick={onPlay}
+            className="rounded-full p-1 text-primary transition-colors hover:bg-primary/10"
+          >
+            <Play className="h-3.5 w-3.5 fill-current" />
+          </button>
+        )}
         <button
           onClick={onSettings}
           className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -41,9 +53,10 @@ function FeedCard({ icon: Icon, title, onSettings, children, color }: {
 
 export function PreferenceCenter() {
   const [settingsSection, setSettingsSection] = useState<SettingsSection | null>(null);
+  const { startDefault } = useStartJourney();
 
   const {
-    journeys, homeAddress, workAddress, city, traffic,
+    journeys, city, traffic,
     weather, news, sport, entertainment, voiceId, musicBed, calendar,
   } = usePreferences();
 
@@ -65,20 +78,32 @@ export function PreferenceCenter() {
     <div className="space-y-3">
 
       {/* ── Traffic ── */}
-      <FeedCard icon={Car} title="Traffic" color="text-orange-400" onSettings={() => open('traffic')}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm">{homeAddress} → {workAddress}</p>
-            <p className="text-xs text-muted-foreground capitalize">{city}</p>
+      <FeedCard icon={Car} title="Traffic" color="text-orange-400" onSettings={() => open('traffic')} onPlay={startDefault}>
+        {traffic.enabled && trafficRoutes[city] ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span>{trafficRoutes[city].from}</span>
+              <span className="text-muted-foreground">→</span>
+              <span>{trafficRoutes[city].to}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-lg font-bold text-orange-400">{trafficRoutes[city].currentDuration} min</span>
+              <span className="text-xs text-muted-foreground">usually {trafficRoutes[city].normalDuration} min</span>
+            </div>
+            {trafficRoutes[city].incidents.length > 0 && (
+              <p className="text-xs text-muted-foreground">{trafficRoutes[city].incidents[0].description}</p>
+            )}
           </div>
-          <Badge variant={traffic.enabled ? 'default' : 'secondary'} className="text-[10px] shrink-0">
-            {traffic.enabled ? 'On' : 'Off'}
-          </Badge>
-        </div>
+        ) : (
+          <button onClick={() => open('traffic')} className="flex items-center gap-2 text-sm text-primary">
+            <MapPin className="h-3.5 w-3.5" />
+            Set your commute route
+          </button>
+        )}
       </FeedCard>
 
       {/* ── Weather ── */}
-      <FeedCard icon={Cloud} title="Weather" color="text-sky-400" onSettings={() => open('weather')}>
+      <FeedCard icon={Cloud} title="Weather" color="text-sky-400" onSettings={() => open('weather')} onPlay={startDefault}>
         {weather.enabled && data ? (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -106,39 +131,50 @@ export function PreferenceCenter() {
             )}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Weather updates off</p>
+          <button onClick={() => open('weather')} className="flex items-center gap-2 text-sm text-primary">
+            <MapPin className="h-3.5 w-3.5" />
+            Set your city for local forecasts
+          </button>
         )}
       </FeedCard>
 
       {/* ── News ── */}
-      <FeedCard icon={Newspaper} title="News" color="text-red-400" onSettings={() => open('news')}>
+      <FeedCard icon={Newspaper} title="News" color="text-red-400" onSettings={() => open('news')} onPlay={startDefault}>
         {news.enabled ? (
           <div className="space-y-2">
+            <p className="text-sm font-medium">Black Caps lineup announced for England tour</p>
             <div className="flex flex-wrap gap-1.5">
               {news.categories.map((c) => (
                 <Badge key={c} className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0 capitalize">{c}</Badge>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground capitalize">Length: {news.length}</p>
+            <p className="text-xs text-muted-foreground capitalize">{news.length} briefing</p>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">News updates off</p>
+          <button onClick={() => open('news')} className="flex items-center gap-2 text-sm text-primary">
+            <Newspaper className="h-3.5 w-3.5" />
+            Choose your news categories
+          </button>
         )}
       </FeedCard>
 
       {/* ── Sport ── */}
-      <FeedCard icon={Trophy} title="Sport" color="text-green-400" onSettings={() => open('sport')}>
+      <FeedCard icon={Trophy} title="Sport" color="text-green-400" onSettings={() => open('sport')} onPlay={startDefault}>
         {sport.enabled ? (
           <div className="space-y-2">
+            <p className="text-sm font-medium">Silver Ferns claim Constellation Cup</p>
             <div className="flex flex-wrap gap-1.5">
               {sport.categories.map((c) => (
                 <Badge key={c} className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0 capitalize">{c}</Badge>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground capitalize">Length: {sport.length}</p>
+            <p className="text-xs text-muted-foreground capitalize">{sport.length} update</p>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Sport updates off</p>
+          <button onClick={() => open('sport')} className="flex items-center gap-2 text-sm text-primary">
+            <Trophy className="h-3.5 w-3.5" />
+            Pick your favourite sports
+          </button>
         )}
       </FeedCard>
 
@@ -148,6 +184,7 @@ export function PreferenceCenter() {
         title={entertainment.type === 'station' ? 'Station' : 'Podcast'}
         color="text-purple-400"
         onSettings={() => open('listen')}
+        onPlay={startDefault}
       >
         {entertainment.type === 'station' && station ? (
           <div className="flex items-center gap-3">
@@ -163,11 +200,24 @@ export function PreferenceCenter() {
             </div>
           </div>
         ) : podcast ? (
-          <div>
-            <p className="text-sm font-semibold">{podcast.name}</p>
-            <p className="text-xs text-muted-foreground">{podcast.host} — {podcast.category}</p>
+          <div className="flex items-center gap-3">
+            {podcast.artwork && (
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+                <Image src={podcast.artwork} alt={podcast.name} fill className="object-cover" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-semibold truncate">{podcast.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{podcast.host}</p>
+              <p className="text-xs text-primary truncate">{podcast.latestEpisode.title}</p>
+            </div>
           </div>
-        ) : null}
+        ) : (
+          <button onClick={() => open('listen')} className="flex items-center gap-2 text-sm text-primary">
+            <Radio className="h-3.5 w-3.5" />
+            Choose your station or podcast
+          </button>
+        )}
       </FeedCard>
 
       {/* ── Voice ── */}
@@ -213,10 +263,10 @@ export function PreferenceCenter() {
             ))}
           </div>
         ) : (
-          <div>
-            <p className="text-sm text-muted-foreground">No calendar connected</p>
-            <p className="text-xs text-muted-foreground mt-1">Tap the cog to connect.</p>
-          </div>
+          <button onClick={() => open('calendar')} className="flex items-center gap-2 text-sm text-primary">
+            <Calendar className="h-3.5 w-3.5" />
+            Connect your calendar to see events
+          </button>
         )}
       </FeedCard>
 
