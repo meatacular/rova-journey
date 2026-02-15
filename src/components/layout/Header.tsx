@@ -3,13 +3,17 @@
 import { UserCircle, Play, Pause } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useStartJourney } from '@/lib/hooks/useStartJourney';
 import { useJourney } from '@/lib/stores/journey';
 
 export function Header() {
+  const pathname = usePathname();
   const { handleStartJourney } = useStartJourney();
   const { isActive, isPlaying, pauseJourney, resumeJourney } = useJourney();
+
+  const headerLabel = pathname === '/journey' ? 'journeys' : 'rova';
 
   const handleClick = () => {
     if (isActive && isPlaying) {
@@ -30,7 +34,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/rova-logo.png" alt="rova" width={28} height={28} />
-          <span className="text-xl font-bold tracking-tight text-foreground">rova</span>
+          <span className="text-xl font-bold tracking-tight text-foreground">{headerLabel}</span>
         </Link>
         <div className="flex items-center gap-2">
           <Button
